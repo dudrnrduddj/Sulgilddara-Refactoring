@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>술길따라 - 술 상세 정보</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/liquor/liquorDetail.css">
+</head>
+<body>
+	<div class="container">
+	    <header>
+	        <div class="header-top">
+	            <div style="width: 100px;;"></div>
+	            	<a href="/" class="logo-link">
+		            <div id="logo-container">
+		                <img src="/img/logo.png" alt="" id="logo">
+			            <h1>술길따라</h1>
+		            </div>
+	            	</a>
+	            <div class="user-actions">
+		            <div class="dropdown" th:if="${session.userId != null}">
+	        			<a href="#" class="icon-user" id="userMenuToggle">
+	            			<img class="header-img" src="/img/free-icon-user-17095347.png" alt="사용자 아이콘">
+	        			</a>
+	        			<div class="mypage-content" id="mypageDropdown">
+	        				<span class="user-name" th:text="${session.userName} + '님'"></span>
+	        					<hr>
+	            			<a href="/user/update">마이페이지</a>
+	            			<a href="/user/logout">로그아웃</a>
+	            			<a href="/reservation/search">예약조회</a>
+	        			</div>
+	    			</div>
+	    			<div th:if="${session.userId == null}">
+	    				<a href="/user/login" class="icon-user">
+		                	<img class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+		                </a>
+		            </div>
+	               	<a href="#" class="icon-menu">
+	                	<img class="header-img" src="/img/free-icon-menu-3856832.png" alt="">
+	                </a>
+	            </div>
+	        	</div>
+	        <nav>
+	            <ul>
+	                <li><a href="/#story">술길따라 이야기</a></li>
+	                <li><a href="/brewery/">양조장 탐방</a></li>
+	                <li><a href="/liquor/search">술 도감</a></li>
+	                <li><a href="/reservation/list">투어 예약</a></li>
+	                <li><a href="/board/listCard">술 이야기</a></li>
+	            </ul>
+	        </nav>
+	    </header>
+	
+		<div class="content-wrapper">
+		    <main>
+		        <nav class="breadcrumb">
+		            <ul>
+		                <li><a href="#">전체</a></li>
+		                <li><a href="#" th:text="${liquor.breweryLocal == 'sudo' ? '수도권' : liquor.breweryLocal == 'gang' ? '강원' : liquor.breweryLocal == 'chung' ? '충청' : liquor.breweryLocal == 'gyeong' ? '경상' : liquor.breweryLocal == 'jeoll' ? '전라' : liquor.breweryLocal == 'jeju' ? '제주' : liquor.breweryLocal}"></a></li>
+		                <li><a href="#" th:text="${liquor.breweryName}"></a></li>
+		                <li><a href="#" th:text="${liquor.liquorType}"></a></li>
+		            </ul>
+		        </nav>
+		
+		        <h2 th:text="${liquor.liquorName}"></h2>
+		
+		        <section class="product-info">
+		            <div class="product-details">
+		            	<table>
+		            		<tr>
+		            			<td><strong>주종</strong></td>
+		            			<td th:text="${liquor.liquorType}"></td>
+		            		</tr>
+		            		<tr>
+		            			<td><strong>양조장</strong></td>
+		            			<td th:text="${liquor.breweryName}"></td>
+		            		</tr>
+		            		<tr>
+		            			<td><strong>도수</strong></td>
+		            			<td th:text="${liquor.alcholContent}"></td>
+		            		</tr>
+		            		<tr>
+		            			<td><strong>용량</strong></td>
+		            			<td th:text="${liquor.liquorCapacity}"></td>
+		            		</tr>
+		            		<tr>
+		            			<td><strong>가격</strong></td>
+		            			<td th:text="${liquor.liquorPrice}"></td>
+		            		</tr>
+		            	</table>
+		            </div>
+		            <div class="product-image" 
+					     th:style="${'background-image: url(''' + 
+					               (#lists.isEmpty(images) ? 
+					                 '/img/liquor/empty_bottle.png' : 
+					                 (images[0].filePath + images[0].fileRename)) + 
+					               '''); background-size: cover; background-position: center; width: 700px; height: 700px;'}">
+					</div>
+
+		        </section>
+		
+		        <section class="reviews">
+		            <h3 class="review-count" th:text="${liquor.reviewCount}+'건의 평가'"></h3>
+		            <div class="rating">
+						<p th:with="score=${liquor.avgPoint}, 
+						             stars=${score < 0.5 ? '☆☆☆☆☆' : 
+						                    score < 1.5 ? '★☆☆☆☆' :
+						                    score < 2.5 ? '★★☆☆☆' :
+						                    score < 3.5 ? '★★★☆☆' :
+						                    score < 4.5 ? '★★★★☆' : '★★★★★'}">
+						  <span th:text="${score}">0.0</span>점 
+						  <span th:text="${stars}">☆☆☆☆☆</span>
+						</p> <br>
+		                <ul class="tags">
+							<li th:each="tag : ${tags}" th:text="${tag.tagName}+'('+${tag.tagCount}+')'"></li>
+		                </ul>
+		            </div>
+
+		
+		            <div class="review-grid">
+						<div class="review-card"  th:if="${!#lists.isEmpty(bList)}" th:each="board : ${bList}">
+									<a style="display: block; text-decoration: none" th:href="@{/board/detailPage/{boardNo}/{viewStatus}(boardNo=${board.boardNo}, viewStatus='yes')}">
+										<div class="boardOne">
+											<div class="review-header">
+							                    <h3 th:text="'['+${board.liquorName}+'] '+${#strings.length(board.boardSubject) > 15 ? board.boardSubject.substring(0, 15) + ' . . .' : board.boardSubject}"></h3>
+							                    
+							                    
+								                    <div class="starContainer" th:if="${board.boardPoint == 0.5}"><i class="fa-solid fa-star-half"></i></div>
+								                    <div class="starContainer"  th:if="${board.boardPoint == 1}"><i class="fa-solid fa-star"></i></div>
+								                    <div class="starContainer"  th:if="${board.boardPoint == 1.5}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half"></i></div>
+								                    <div class="starContainer"  th:if="${board.boardPoint == 2}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+								                    <div class="starContainer"  th:if="${board.boardPoint == 2.5}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half"></i></div>
+								                    <div class="starContainer"  th:if="${board.boardPoint == 3}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+								                    <div class="starContainer"  th:if="${board.boardPoint == 3.5}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half"></i></div>
+								                    <div class="starContainer"  th:if="${board.boardPoint == 4}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+								                    <div class="starContainer"  th:if="${board.boardPoint == 4.5}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half"></i></div>
+								                    <div class="starContainer"  th:if="${board.boardPoint == 5}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+								                    
+						                	</div>
+									
+					                	
+										<div class="review-content">
+											<div th:each="bFile : ${bFileList}"  th:if="${bFile.boardNo == board.boardNo}">
+												<div class="thumbnail" th:style="'background-image: url('+ ${bFile.boardFilePath}+${bFile.boardFileRename} + ');background-position: center;background-size: cover;background-repeat: no-repeat; '"></div>
+											</div>
+											
+						                    <div th:utext="${board.boardContent}" class="contentDiv-text"></div>
+						                    <div style="padding: 0 10px">
+						                		<span style="margin-right:10px;" th:text="${#dates.format(board.boardDate, 'yyyy년 MM월 dd일')}"></span>
+						                		
+						                		<span th:text="'댓글 총 0개'"></span>
+						                    </div>
+					                	</div>
+					                	
+					                	
+										
+					                	<div class="review-footer">
+					                		
+						                    
+											<div id="bTagList">
+												<span style="font-weight: 800;" th:each="tag : ${bTagList}" th:if="${tag.boardNo == board.boardNo}">#[[${tag.boardTagName}]] </span>
+											</div>
+											<div style="display: flex; justify-content: space-between;">
+												<span style="color: gray" th:text="'by '+${board.userId}"></span>
+							                    <span th:text="'조회수: ' + ${board.viewCount}"></span>
+											</div>
+					                	</div>
+					                	
+						<!-- 				프로필사진, 회원ID,  -->
+						
+									</div>
+								</a>
+						</div>
+						
+					</div>
+		
+		            <button type="button" class="write-review" th:onclick="'window.location.href=\'' + @{/board/writePage} + '\''">리뷰쓰기</button>
+		        </section>
+		    </main>
+	    </div>
+	
+	    <footer>
+	        <nav>
+	            <a href="#">이용약관</a> |
+	            <a href="#">개인정보처리방침</a> |
+	            <a href="#">사이트맵</a>
+	        </nav>
+	        <div class="company-info">
+	            <p>상호 : 술길따라 | 대표이사 : 김정욱 | 설립일 : 2024년 8월 26일 | 개인정보관리책임자 : 홍예은</p>
+	            <p>문의 : jwkim@gmail.com | 사업자등록번호 : 111-22-33333 | 서울시 중구 남대문로 120</p>
+	        </div>
+	        <div class="social-icons">
+	            <a href="#" class="icon-facebook"><img src="../../img/free-icon-facebook-circular-logo-20673.png" alt=""></a>
+	            <a href="#" class="icon-instagram"><img src="../../img/free-icon-instagram-4922972.png" alt=""></a>
+	        </div>
+	        <p class="copyright">Copyright 2024 Sulgilddara Inc. | All Rights Reserved</p>
+	    </footer>
+    </div>
+    <script>
+	    document.addEventListener('DOMContentLoaded', function() {
+			const userMenuToggle = document.getElementById('userMenuToggle');
+			const mypageDropdown = document.getElementById('mypageDropdown');
+			
+			if (userMenuToggle && mypageDropdown) {
+			    userMenuToggle.addEventListener('click', function(e) {
+			        e.preventDefault();
+			        mypageDropdown.classList.toggle('show');
+			    });
+			
+			    // 드롭다운 외부 클릭 시 닫기
+			    window.addEventListener('click', function(e) {
+			        if (!e.target.matches('.icon-user') && !e.target.matches('.header-img')) {
+			            if (mypageDropdown.classList.contains('show')) {
+			                mypageDropdown.classList.remove('show');
+			            }
+			        }
+			    });
+			}
+		});
+    </script>
+</body>
+</html>

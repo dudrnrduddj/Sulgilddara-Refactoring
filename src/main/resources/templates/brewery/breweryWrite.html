@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>양조장 정보 등록</title>
+		<script src="https://unpkg.com/@yaireo/tagify"></script>
+		<link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+		<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="../../../css/brewery/breweryWrite.css">		
+		<style>
+			.tagify {
+			    display: inline-flex;
+			    flex-wrap: wrap;
+			    font-size: 15px; /* 기본 폰트 크기 */
+			    padding: 10px; /* 패딩 추가 */
+			    border-radius: 8px; /* 테두리 둥글게 */
+			    border: 1px solid #ccc; /* 테두리 색상 */
+			    outline: none; /* 포커스 시 외곽선 제거 */
+			    width: calc(100% - 22px); /* 너비 설정 (패딩과 테두리를 고려) */
+			    box-sizing: border-box; /* 패딩 및 테두리를 포함하여 너비를 계산 */
+			    margin-bottom: 10px; /* 필드 간 간격 */
+			}
+			
+			.tagify__tag {
+			    display: inline-flex;
+			    align-items: center;
+			    margin: 0.2em;
+			    background: none;   /* 배경 제거 */
+			    border: none;       /* 테두리 제거 */
+			    border-radius: 3px;
+			}
+			
+			.tagify__tag__removeBtn {
+			    margin-left: 0.3em;
+			    cursor: pointer;
+			    background: none;   /* 배경 제거 */
+			    border: none;       /* 테두리 제거 */
+			    color: inherit;     /* 색상 상속 */
+			}
+			
+			.tagify__input {
+			    border: none;       /* 테두리 제거 */
+			    margin: 0;
+			    padding: 0;         /* 여백 제거 */
+			    outline: none;      /* 포커스 스타일 제거 */
+			    flex-grow: 1;
+			    min-width: 120px;   /* 최소 너비 */
+			}
+			.tagify__tag > div {
+			    padding: 0;
+			}
+			.tagify--focus {
+			    --tags-border-color: black !important;  /* 또는 원하는 색상 */
+			    transition: none !important;  /* 애니메이션 효과 제거 */
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+		<div class="header-top">
+			<div style="width: 100px;;"></div>
+	            <a href="/" class="logo-link">
+					<div id="logo-container">
+						<img src="../../img/logo.png" alt="" id="logo">
+						<h1>술길따라</h1>
+					</div>
+				</a>
+			<div class="user-actions">
+		            <div class="dropdown" th:if="${session.userId != null}">
+	        			<a href="#" class="icon-user" id="userMenuToggle">
+	            			<img class="header-img" src="/img/free-icon-user-17095347.png" alt="사용자 아이콘">
+	        			</a>
+	        			<div class="mypage-content" id="mypageDropdown">
+	        				<span class="user-name" th:text="${session.userName} + '님'"></span>
+	        					<hr>
+	            			<a href="/user/update">마이페이지</a>
+	            			<a href="/user/logout">로그아웃</a>
+	            			<a href="/reservation/search">예약조회</a>
+	        			</div>
+	    			</div>
+	    			<div th:if="${session.userId == null}">
+	    				<a href="/user/login" class="icon-user">
+		                	<img class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+		                </a>
+		            </div>
+	               	<a href="#" class="icon-menu">
+	                	<img class="header-img" src="/img/free-icon-menu-3856832.png" alt="">
+	                </a>	                
+	    		</div>
+			</div>
+			<nav>
+				<ul>
+					<li><a href="/brewery/admin/list">양조장 정보</a></li>
+	                <li><a href="/liquor/list">술 정보</a></li>
+	                <li><a href="/reservation/searchListAdmin">투어 예약 정보</a></li>
+				</ul>
+			</nav>
+		</header>
+		
+		<main>
+			<form action="/brewery/admin/write" method="post" enctype="multipart/form-data">
+				<label for="breweryName" class="form-label">양조장명</label>
+				<input type="text" id="breweryName" name="breweryName" class="form-input"> <br>
+				
+				<label for="local" class="form-label">지역</label>
+				<select id="local" name="breweryLocal" class="form-select">
+				    <option value="sudo">수도권</option>
+				    <option value="gang">강원</option>
+				    <option value="chung">충청</option>
+				    <option value="gyeong">경상</option>
+				    <option value="jeoll">전라</option>
+				    <option value="jeju">제주</option>
+				</select> <br>
+				
+				<label for="breweryAddr" class="form-label">주소</label>
+				<input type="text" id="breweryAddr" name="breweryAddr" class="form-input"> <br>
+				
+				<label for="breweryPhone" class="form-label">번호</label>
+				<input type="text" id="breweryPhone" name="breweryPhone" class="form-input"> <br>
+				
+				<label for="openTime" class="form-label">오픈시간</label>
+				<input type="time" id="openTime" name="openTime" class="form-input"> <br>
+				
+				<label for="closeTime" class="form-label">마감시간</label>
+				<input type="time" id="closeTime" name="closeTime" class="form-input"> <br>
+				
+				<label for="breweryUrl" class="form-label">홈페이지</label>
+				<input type="text" id="breweryUrl" name="breweryUrl" class="form-input"> <br>
+				
+				<label for="uploadFile" class="form-label">사진 업로드</label>
+				<input type="file" id="newFileInput" name="uploadFile" class="file-input">
+				<label for="breweryTagName" class="form-label">해시태그</label>
+				<input type="text" id="breweryTagName" name="breweryTagName" class="form-input"> <br>
+				<div id="facilitiesContainer" class="facilities-container">
+				    <fieldset class="facilities-fieldset">
+				        <legend>편의시설</legend>
+				        
+				        <label for="park" class="facility-label">
+				            <input type="checkbox" id="park" name="facilities" value="park" class="facility-checkbox">
+				            주차장
+				        </label>
+				        
+				        <label for="restroom" class="facility-label">
+				            <input type="checkbox" id="restroom" name="facilities" value="restroom" class="facility-checkbox">
+				            화장실
+				        </label>
+				        
+				        <label for="wifi" class="facility-label">
+				            <input type="checkbox" id="wifi" name="facilities" value="wifi" class="facility-checkbox">
+				            와이파이
+				        </label>
+				        
+				        <label for="air-conditioner" class="facility-label">
+				            <input type="checkbox" id="air-conditioner" name="facilities" value="air-conditioner" class="facility-checkbox">
+				            에어컨
+				        </label>
+				        
+				        <label for="cafe" class="facility-label">
+				            <input type="checkbox" id="cafe" name="facilities" value="cafe" class="facility-checkbox">
+				            카페
+				        </label>
+				        
+				        <label for="information" class="facility-label">
+				            <input type="checkbox" id="information" name="facilities" value="information" class="facility-checkbox">
+				            유도 및 안내시설
+				        </label>
+				        
+				        <label for="luggage" class="facility-label">
+				            <input type="checkbox" id="luggage" name="facilities" value="luggage" class="facility-checkbox">
+				            짐 보관 가능
+				        </label>
+				        
+				        <label for="non-smoking" class="facility-label">
+				            <input type="checkbox" id="non-smoking" name="facilities" value="non-smoking" class="facility-checkbox">
+				            금연
+				        </label>
+				        
+				        <label for="smoking" class="facility-label">
+				            <input type="checkbox" id="smoking" name="facilities" value="smoking" class="facility-checkbox">
+				            흡연구역
+				        </label>
+				        
+				        <label for="restaurant" class="facility-label">
+				            <input type="checkbox" id="restaurant" name="facilities" value="restaurant" class="facility-checkbox">
+				            레스토랑
+				        </label>
+				    </fieldset>
+				    
+				    <fieldset class="kids-zone-fieldset">
+				        <legend>키즈존</legend>
+				        
+				        <label for="kidsZoneYes" class="radio-label">
+				            <input type="radio" id="kidsZoneYes" name="kidsZone" value="yes" class="radio-input">
+				            입장 가능
+				        </label>
+				        
+				        <label for="kidsZoneNo" class="radio-label">
+				            <input type="radio" id="kidsZoneNo" name="kidsZone" value="no" class="radio-input">
+				            입장 불가
+				        </label>
+				    </fieldset>
+				    
+				    <fieldset class="disabled-friendly-fieldset">
+				        <legend>장애인 편의시설</legend>
+				        
+				        <label for="disabledFriendlyYes" class="radio-label">
+				            <input type="radio" id="disabledFriendlyYes" name="disFriendly" value="yes" class="radio-input">
+				            휠체어 출입구
+				        </label>
+				        
+				        <label for="disabledFriendlyNo" class="radio-label">
+				            <input type="radio" id="disabledFriendlyNo" name="disFriendly" value="no" class="radio-input">
+				            별도 시설 없음
+				        </label>
+				    </fieldset>
+				</div>
+				<input type="submit" id="modify-btn" value="등록">
+			</form>
+		</main>
+			
+		<footer>
+			<nav>
+	            <a href="#">이용약관</a> |
+	            <a href="#">개인정보처리방침</a> |
+	            <a href="#">사이트맵</a>
+	        </nav>
+	        <div class="company-info">
+	            <p>상호 : 술길따라 | 대표이사 : 김정욱 | 설립일 : 2024년 8월 26일 | 개인정보관리책임자 : 홍예은</p>
+	            <p>문의 : jwkim@gmail.com | 사업자등록번호 : 111-22-33333 | 서울시 중구 남대문로 120</p>
+	        </div>
+	        <div class="social-icons">
+	            <a href="#" class="icon-facebook"><img src="../../img/free-icon-facebook-circular-logo-20673.png" alt=""></a>
+	            <a href="#" class="icon-instagram"><img src="../../img/free-icon-instagram-4922972.png" alt=""></a>
+	        </div>
+	        <p class="copyright">Copyright 2024 Sulgilddara Inc. | All Rights Reserved</p>
+		</footer>
+		
+		
+	</body>
+	<script>
+		var input = document.querySelector('input[name=breweryTagName]');
+		var tagify = new Tagify(input, {
+		    delimiters: null, // 구분자를 없애 한 글자 입력 시 태그가 생성되지 않게 설정
+		    enforceWhitelist: false,
+		    editTags: true,
+		    dropdown: {
+		        enabled: 0 // 자동으로 드롭다운이 나타나는 것을 막음
+		    }
+		});
+		document.addEventListener('DOMContentLoaded', function() {
+			const userMenuToggle = document.getElementById('userMenuToggle');
+			const mypageDropdown = document.getElementById('mypageDropdown');
+			
+			if (userMenuToggle && mypageDropdown) {
+			    userMenuToggle.addEventListener('click', function(e) {
+			        e.preventDefault();
+			        mypageDropdown.classList.toggle('show');
+			    });
+			
+			    // 드롭다운 외부 클릭 시 닫기
+			    window.addEventListener('click', function(e) {
+			        if (!e.target.matches('.icon-user') && !e.target.matches('.header-img')) {
+			            if (mypageDropdown.classList.contains('show')) {
+			                mypageDropdown.classList.remove('show');
+			            }
+			        }
+			    });
+			}
+		});
+	</script>
+</html>

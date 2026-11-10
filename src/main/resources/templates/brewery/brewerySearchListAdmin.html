@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://thymeleaf.org">
+	<head>
+		<meta charset="UTF-8">
+		<title>양조장 전체 리스트</title>
+		<link rel="stylesheet" href="../../css/brewery/brewerySearchListAdmin.css">
+		<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+	</head>
+	<body>
+		<header>
+		<div class="header-top">
+			<div style="width: 100px;;"></div>
+	            <a href="/" class="logo-link">
+					<div id="logo-container">
+						<img src="../../img/logo.png" alt="" id="logo">
+						<h1>술길따라</h1>
+					</div>
+				</a>
+			<div class="user-actions">
+		            <div class="dropdown" th:if="${session.userId != null}">
+	        			<a href="#" class="icon-user" id="userMenuToggle">
+	            			<img class="header-img" src="/img/free-icon-user-17095347.png" alt="사용자 아이콘">
+	        			</a>
+	        			<div class="mypage-content" id="mypageDropdown">
+	        				<span class="user-name" th:text="${session.userName} + '님'"></span>
+	        					<hr>
+	            			<a href="/user/update">마이페이지</a>
+	            			<a href="/user/logout">로그아웃</a>
+	            			<a href="/reservation/search">예약조회</a>
+	        			</div>
+	    			</div>
+	    			<div th:if="${session.userId == null}">
+	    				<a href="/user/login" class="icon-user">
+		                	<img class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+		                </a>
+		            </div>
+	               	<a href="#" class="icon-menu">
+	                	<img class="header-img" src="/img/free-icon-menu-3856832.png" alt="">
+	                </a>	                
+	    		</div>
+			</div>
+	        <nav>
+	            <ul>
+					<li><a href="/brewery/admin/list">양조장 정보</a></li>
+	                <li><a href="/liquor/list">술 정보</a></li>
+	                <li><a href="/reservation/searchListAdmin">투어 예약 정보</a></li>
+	            </ul>
+	        </nav>
+		</header>
+
+		<main>
+<!-- 		<h1>양조장 목록 조회</h1> -->
+			<form action="/brewery/admin/search" method="post">
+			<table id="searchTable">
+	        <tr>
+	            <td>
+		            <select name="searchCondition"  id="searchCondition" onchange="this.form.submit()">
+		                <option value="brewery" th:selected="${searchCondition == 'brewery'}">양조장</option>
+		                <option value="local" th:selected="${searchCondition == 'local'}">지역</option>
+		            </select>
+	            </td>
+	            <td>
+	                <!-- 검색 조건에 따라 적절한 입력 필드 표시 -->
+	                <div th:if="${searchCondition == 'local'}" class="searchKeywordLocal">
+	                    <select name="searchKeyword" class="searchKeywordSelect">
+	                    	<option value="">전체</option>
+	                        <option value="sudo">수도권</option>
+	                        <option value="gang">강원</option>
+	                        <option value="chung">충청</option>
+	                        <option value="gyeong">경상</option>
+	                        <option value="jeoll">전라</option>
+	                        <option value="jeju">제주</option>
+	                    </select>
+	                </div>
+	                <div th:if="${searchCondition != 'local'}" class="searchKeywordInputDiv">
+	                    <input type="text" name="searchKeyword"  class="searchKeywordInput" placeholder="검색어를 입력하세요" th:value="${searchKeyword}">
+	                </div>
+	            </td>
+	            <td>
+	                <input type="submit" class="searchButton" value="검색">
+	            </td>
+	        </tr>
+	    </table>
+		    <table id="breweryListTable">
+		        <thead>
+		            <tr>
+		            	<th>번호</th>
+		                <th>양조장명</th>
+		                <th>지역</th>
+		                <th>수정일시</th>
+		                <th></th>
+		                <th></th>
+		            </tr>
+		        </thead>
+		        <tbody>
+				    <tr th:each="brewery : ${sList}" th:unless="${#lists.isEmpty(sList)}">
+				    	<td class="breweryNo" th:text="${brewery.breweryNo}"></td>
+				        <td class="breweryName" th:text="${brewery.breweryName}"></td>
+				        <td class="breweryLocal" th:text="${brewery.breweryLocal == 'sudo' ? '수도권' : brewery.breweryLocal == 'gang' ? '강원' : brewery.breweryLocal == 'chung' ? '충청' : brewery.breweryLocal == 'gyeong' ? '경상' : brewery.breweryLocal == 'jeoll' ? '전라' : brewery.breweryLocal == 'jeju' ? '제주' : brewery.breweryLocal}"></td>
+				        <td class="bUpdateDate" th:text="${brewery.bUpdateDate}"></td>
+				  	    <td><button type="button" class="modifyButton" th:onclick="modifyBrewery(/*[[${brewery.breweryNo}]]*/);">수정</button></td>
+				    	<td><button type="button" class="deleteButton" th:onclick="deleteBrewery(/*[[${brewery.breweryNo}]]*/);">삭제</button></td>
+				    </tr>
+				</tbody>
+				<tfoot th:if="${pn.totalCount > 0}">
+				    <tr align="center">
+				        <td colspan="6">
+				            <th:block th:each="p : ${#numbers.sequence(pn.startNavi, pn.endNavi)}">
+				                <a th:href="@{/brewery/admin/search(cp=${p}, searchCondition=${searchCondition}, searchKeyword=${searchKeyword})}" th:text="${p}" class="paginationLink"></a>						
+				            </th:block>
+				        </td>
+				    </tr>
+				</tfoot>
+				<th:block th:if="${pn.totalCount == 0}">
+				    <tr align="center">
+				        <td colspan="6">
+				            검색 결과가 없습니다.
+				        </td>
+				    </tr>
+				</th:block>
+			</table>
+			<button type="button" class="insertButton" th:onclick="goInsert()">양조장 등록</button>
+			</form>
+		</main>
+	</body>
+	<script th:inline="javascript">
+	    function modifyBrewery(breweryNo) {
+	        console.log(breweryNo);
+	        location.href = "/brewery/admin/update/" + breweryNo;
+	    }
+	    function deleteBrewery(breweryNo) {
+	        console.log(breweryNo);
+	        if (confirm("정말 삭제하시겠습니까?")) {
+	            location.href = "/brewery/admin/delete/" 	+ breweryNo;
+	        }
+	    }
+	    function goInsert() {
+	    	location.href = "/brewery/admin/write";
+	    }
+        
+	</script>
+</html>

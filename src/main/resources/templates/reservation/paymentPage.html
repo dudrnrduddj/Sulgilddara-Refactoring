@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+
+<head>
+<meta charset="UTF-8">
+<title>결제 정보 창</title>
+<link rel="stylesheet" href="/css/reservation/paymentPage.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap"
+	rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+	<header>
+		<div class="header-top">
+			<div style="width: 100px;"></div>
+			<a href="/" class="logo-link">
+				<div id="logo-container">
+					<img src="../img/logo.png" alt="" id="logo">
+					<h1>술길따라</h1>
+				</div>
+			</a>
+			<div class="user-actions">
+				<div class="dropdown" th:if="${session.userId != null}">
+					<a href="#" class="icon-user" id="userMenuToggle"> <img
+						class="header-img" src="/img/free-icon-user-17095347.png"
+						alt="사용자 아이콘">
+					</a>
+					<div class="mypage-content" id="mypageDropdown">
+						<span class="user-name" th:text="${session.userName} + '님'"></span>
+						<hr>
+						<a href="/user/update">마이페이지</a> <a href="/user/logout">로그아웃</a> <a
+							href="/reservation/search">예약조회</a>
+					</div>
+				</div>
+				<div th:if="${session.userId == null}">
+					<a href="/user/login" class="icon-user"> <img
+						class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+					</a>
+				</div>
+				<a href="#" class="icon-menu"> <img class="header-img"
+					src="/img/free-icon-menu-3856832.png" alt="">
+				</a>
+			</div>
+		</div>
+		<nav>
+			<ul>
+				<li><a href="/#story">술길따라 이야기</a></li>
+				<li><a href="/brewery/">양조장 탐방</a></li>
+				<li><a href="/liquor/search">술 도감</a></li>
+				<li><a href="/reservation/list">투어 예약</a></li>
+				<li><a href="/board/listCard">술 이야기</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+
+
+		<div class="main" th:each="Reservation: ${rList}">
+			<div class="main-left">
+				<div class="payment-boxx payment-method">
+					<h3>결제 수단</h3>
+					<label><input type="radio" name="payment" value="카카오페이">
+						카카오페이</label><br> <label> <input type="radio" name="payment"
+						value="무통장" disabled="disabled"> 무통장
+					</label>
+
+				</div>
+				<label>결제 수단 입력</label>
+				<hr>
+				<div class="payment-box kakao-pay-info">
+					<div class="kakaoPayImg">
+						<img alt="카카오페이" src="/img/reservation/kakaoPay.png">
+					</div>
+					<div class="paymentMethod">
+						<span id="paymentMethod">결제 이메일</span> <span id="kakaoPayEmail"
+							th:text="${Reservation.email}">user@example.com</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="main-right">
+				<div class="payment-div">
+					<h3>총 결제금액</h3>
+					<div class="total-amount"
+						th:text="${#numbers.formatDecimal((Reservation.tourPrice*Reservation.visitorNum) + (Reservation.tourPrice * 0.1), 0, 0)} + '원'"></div>
+					<hr>
+					<div class="payment-info">
+						<div class="tourPrice">
+							<span><h3>상품금액</h3></span>
+							<div class="price"
+								th:text="${Reservation.tourPrice*Reservation.visitorNum + '원'}"></div>
+						</div>
+						<div class="tourPrice">
+							<span id="productPrice"><h3>VAT</h3></span> <span class="price"
+								th:text="${#numbers.formatDecimal(Reservation.tourPrice * 0.1,0,0) + '원'}"></span>
+						</div>
+					</div>
+				</div>
+				<form method="post" th:action="@{/kakaoPay}" id="paymentForm">
+					<button type="submit" class="pay-button">결제 하기</button>
+
+					<input type="hidden" name="reserveNo"
+						th:value="${Reservation.reserveNo}"> <input type="hidden"
+						name="email" th:value="${Reservation.email}"> <input
+						type="hidden" name="tourPrice" th:value="${Reservation.tourPrice}">
+					<input type="hidden" name="userId" th:value="${Reservation.userId}">
+					<input type="hidden" name="tourName"
+						th:value="${Reservation.tourName}"> <input type="hidden"
+						name="breweryName" th:value="${Reservation.breweryName}">
+					<input type="hidden" name="breweryNo"
+						th:value="${Reservation.breweryNo}"> <input type="hidden"
+						name="tourContent" th:value="${Reservation.tourContent}">
+					<input type="hidden" name="visitorNum"
+						th:value="${Reservation.visitorNum}">
+				</form>
+			</div>
+		</div>
+	</main>
+	<footer>
+		<nav>
+			<a href="#">이용약관</a> | <a href="#">개인정보처리방침</a> | <a href="#">사이트맵</a>
+		</nav>
+		<div class="company-info">
+			<p>상호 : 술길따라 | 대표이사 : 김정욱 | 설립일 : 2024년 8월 26일 | 개인정보관리책임자 : 홍예은</p>
+			<p>문의 : jwkim@gmail.com | 사업자등록번호 : 111-22-33333 | 서울시 중구 남대문로
+				120</p>
+		</div>
+		<div class="social-icons">
+			<a href="#" class="icon-facebook"><img
+				src="../img/free-icon-facebook-circular-logo-20673.png" alt=""></a>
+			<a href="#" class="icon-instagram"><img
+				src="../img/free-icon-instagram-4922972.png" alt=""></a>
+		</div>
+		<p class="copyright">Copyright 2024 Sulgilddara Inc. | All Rights
+			Reserved</p>
+	</footer>
+	<script>
+	    document.addEventListener('DOMContentLoaded', function() {
+	        var form = document.getElementById('paymentForm');
+	        var paymentRadios = document.getElementsByName('payment');
+	        
+	        form.addEventListener('submit', function(event) {
+	            var isChecked = Array.from(paymentRadios).some(radio => radio.checked);
+	            
+	            if (!isChecked) {
+	                event.preventDefault(); // 폼 제출을 막습니다
+	                alert('결제 수단을 선택해주세요.');
+	            }
+	        });
+	    });
+	    
+	    //
+	    $(document).ready(function(){
+	        $('.payment-box.kakao-pay-info').hide(); // 초깃값 설정
+	        $('.payment-box.noBankBook-info').hide(); // 무통장입금 정보도 초기에 숨김
+	
+	        $("input[name='payment']").change(function(){
+	            // 모든 payment-box를 숨김
+	            $('.payment-box').hide();
+	
+	            // 카카오 결제 선택 시
+	            if($(this).val() == '카카오페이'){
+	                $('.payment-box.kakao-pay-info').show();
+	            }
+	            // 무통장입금 결제 선택 시
+	            else if($(this).val() == '무통장'){
+	
+					alert("현재 무통장 서비스는 진행되지 않습니다");
+	             /*    $('.payment-box.noBankBook-info').show(); */
+	            }
+	        });
+	    });
+	    document.addEventListener('DOMContentLoaded', function() {
+			const userMenuToggle = document.getElementById('userMenuToggle');
+			const mypageDropdown = document.getElementById('mypageDropdown');
+			
+			if (userMenuToggle && mypageDropdown) {
+			    userMenuToggle.addEventListener('click', function(e) {
+			        e.preventDefault();
+			        mypageDropdown.classList.toggle('show');
+			    });
+			
+			    // 드롭다운 외부 클릭 시 닫기
+			    window.addEventListener('click', function(e) {
+			        if (!e.target.matches('.icon-user') && !e.target.matches('.header-img')) {
+			            if (mypageDropdown.classList.contains('show')) {
+			                mypageDropdown.classList.remove('show');
+			            }
+			        }
+			    });
+			}
+		});
+    </script>
+</body>
+</html>

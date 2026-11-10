@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.makjan.sulgilddara.tour.model.mapper.TourMapper">
+	  <insert id="insertTour">
+	  	<selectKey order="BEFORE" resultType="_int" keyProperty="tourNo">
+	  		SELECT SEQ_TOUR_NO.NEXTVAL FROM DUAL
+	  	</selectKey>
+			INSERT INTO TOUR_TBL
+			VALUES(#{tourNo},
+					#{tourName},
+					#{tourContent},
+					#{timeTaken},
+					#{tourPrice},
+					#{breweryNo},
+					#{fileName},
+					#{fileRename},
+					#{filePath})
+	  </insert>
+	  <select id="showTourByBrwNo" resultType="Tour">
+	  	SELECT * FROM TOUR_TBL WHERE BREWERY_NO=#{breweryNo}
+	  </select>
+	  <select id="searchOneByNo" resultType="Tour">
+	  SELECT * FROM TOUR_TBL join brewery_tbl using(brewery_no) WHERE TOUR_No=#{tourNo}
+	  </select>
+	  <update id="updateTour">
+	  	UPDATE TOUR_TBL
+	  	SET TOUR_NAME=#{tourName},
+	  	TOUR_CONTENT=#{tourContent},
+	  	TIME_TAKEN=#{timeTaken},
+	  	TOUR_PRICE=#{tourPrice},
+	  	FILENAME=#{fileName},
+	  	FILERENAME=#{fileRename},
+	  	FILEPATH=#{filePath}
+	  	WHERE TOUR_NO=#{tourNo}
+	  </update>
+	  <delete id="deleteTour">
+	  	DELETE FROM TOUR_TBL
+	  	WHERE TOUR_NO=#{tourNo}
+	  </delete>
+	  <select id="searchByNo" resultType="Tour">
+	  SELECT * FROM TOUR_TBL JOIN BREWERY_TBL USING(brewery_no)
+	  WHERE TOUR_NO=#{tourNo}
+	  </select>
+	  
+	  <select id="showInfoByNo" resultType="Tour">
+	  	SELECT * FROM TOUR_TBL JOIN BREWERY_TBL USING(BREWERY_NO) WHERE TOUR_NO=#{tourNo} AND BREWERY_NO=#{breweryNo}
+	  </select>
+	  
+	  <select id="searchByInfo" resultType="Tour">
+	  	SELECT * FROM TOUR_TBL JOIN BREWERY_TBL USING(BREWERY_NO) WHERE TOUR_NO=#{tourNo} AND BREWERY_NO=#{breweryNo}
+	  </select>
+  </mapper>

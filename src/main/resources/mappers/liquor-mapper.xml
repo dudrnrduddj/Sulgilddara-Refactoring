@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.makjan.sulgilddara.liquor.model.mapper.LiquorMapper">
+	<insert id="addLiquor" useGeneratedKeys="true">
+		<selectKey order="BEFORE" resultType="_int" keyProperty="liquorId">
+			SELECT SEQ_LIQUOR_NO.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO LIQUOR_TBL
+		VALUES(#{liquorId} , #{liquorName} , #{alcholContent}, #{liquorType}, #{liquorPrice}, #{liquorCapacity}, DEFAULT, DEFAULT, #{breweryId})
+	</insert>
+	<update id="updateLiquor" useGeneratedKeys="true">
+		UPDATE LIQUOR_TBL
+		SET LIQUOR_NAME = #{liquorName} , ALCHOL_CONTENT = #{alcholContent}, LIQUOR_TYPE = #{liquorType}, LIQUOR_PRICE = #{liquorPrice}, LIQUOR_CAPACITY = #{liquorCapacity}, L_UPDATE_DATE = SYSTIMESTAMP, BREWERY_ID = #{breweryId} WHERE LIQUOR_ID LIKE #{liquorId}
+	</update>
+	<delete id="deleteLiquor">
+		DELETE FROM LIQUOR_TBL
+		WHERE LIQUOR_ID LIKE #{liquorId}
+	</delete>
+	<select id="getTotalCount" resultType="_int">
+		SELECT COUNT(*) FROM LIQUOR_TBL
+		<where>
+			<if test="keyword != null and keyword != ''">
+				LIQUOR_NAME LIKE '%'||#{keyword}||'%'
+			</if>
+			<if test="liquorType != 'all'">
+				AND LIQUOR_TYPE = #{liquorType}
+			</if>
+		</where>
+	</select>
+	<select id="selectLiquorList" resultType="Liquor">
+		SELECT * FROM LIQUOR_TBL 
+		<where>
+			<if test="keyword != null and keyword != ''">
+				LIQUOR_NAME LIKE '%'||#{keyword}||'%'
+			</if>
+			<if test="liquorType != 'all'">
+				AND LIQUOR_TYPE = #{liquorType}
+			</if>
+		</where>
+		ORDER BY LIQUOR_ID DESC
+	</select>
+	<select id="selectOneById" resultType="LiquorDetail">
+		SELECT LIQUOR_ID, LIQUOR_NAME, ALCHOL_CONTENT, LIQUOR_TYPE, LIQUOR_PRICE, LIQUOR_CAPACITY, L_CREATE_DATE, L_UPDATE_DATE, BREWERY_ID, BREWERY_NAME, BREWERY_LOCAL, AVG_POINT, REVIEW_COUNT 
+		FROM LIQUOR_TBL 
+		JOIN BREWERY_TBL 
+		ON LIQUOR_TBL.BREWERY_ID = BREWERY_TBL.BREWERY_NO 
+		LEFT OUTER JOIN
+		(SELECT LIQUOR_ID, ROUND(AVG(BOARD_POINT), 2) AVG_POINT, COUNT(*) REVIEW_COUNT FROM BOARD_TBL GROUP BY LIQUOR_ID)
+		USING(LIQUOR_ID)
+		WHERE LIQUOR_ID = #{liquorId}
+	</select>
+	<select id="liquorSearch" parameterType="map" resultType="LiquorDetail">
+		SELECT * FROM
+		(
+			SELECT * FROM
+			(SELECT LIQUOR_ID, LIQUOR_NAME, ALCHOL_CONTENT, LIQUOR_TYPE, LIQUOR_PRICE, LIQUOR_CAPACITY, L_CREATE_DATE, L_UPDATE_DATE, BREWERY_ID, BREWERY_NAME, BREWERY_LOCAL
+			FROM LIQUOR_TBL
+			LEFT OUTER JOIN BREWERY_TBL
+				ON LIQUOR_TBL.BREWERY_ID = BREWERY_TBL.BREWERY_NO
+			<where>
+					<if test="sInfo.keyword != null and sInfo.keyword !=''">
+						AND LIQUOR_NAME LIKE '%'||#{sInfo.keyword}||'%'
+					</if>
+					<if test="sInfo.breweryLocal != 'all' and sInfo.breweryLocal != null">
+						AND BREWERY_LOCAL = #{sInfo.breweryLocal}
+					</if>
+					<if test="sInfo.liquorType != 'all' and sInfo.liquorType != null">
+						AND LIQUOR_TYPE = #{sInfo.liquorType}
+					</if>
+					<if test="sInfo.alcholMin != null">
+						AND ALCHOL_CONTENT &gt;= #{sInfo.alcholMin}
+					</if>
+					<if test="sInfo.alcholMax != null">
+						AND ALCHOL_CONTENT &lt;= #{sInfo.alcholMax}
+					</if>
+					<if test="sInfo.capacityMin != null">
+						AND LIQUOR_CAPACITY &gt;= #{sInfo.capacityMin}
+					</if>
+					<if test="sInfo.capacityMax != null">
+						AND LIQUOR_CAPACITY &lt;= #{sInfo.capacityMax}
+					</if>
+					<if test="sInfo.priceMin != null">
+						AND LIQUOR_PRICE &gt;= #{sInfo.priceMin}
+					</if>
+					<if test="sInfo.priceMax != null">
+						AND LIQUOR_PRICE &lt;= #{sInfo.priceMax}
+					</if>
+				<if test="tags != null">
+					AND LIQUOR_ID IN
+					(SELECT LIQUOR_ID
+					FROM LIQUOR_TBL L
+					LEFT OUTER JOIN (
+						SELECT BOARD_TAG_NAME, LIQUOR_ID
+						FROM BOARD_TAG_TBL
+						LEFT OUTER JOIN BOARD_TBL
+						USING(BOARD_NO)
+					) T
+					USING(LIQUOR_ID)
+					WHERE
+							T.BOARD_TAG_NAME IN
+							<foreach item="tag" collection="tags" open="(" separator="," close=")">
+								#{tag}
+							</foreach>
+					GROUP BY LIQUOR_ID
+						HAVING COUNT(BOARD_TAG_NAME) >= #{tagLength}
+					)
+				</if>
+			</where>
+			) A
+			LEFT OUTER JOIN
+			(SELECT LIQUOR_ID, ROUND(AVG(BOARD_POINT), 2) AVG_POINT, COUNT(*) REVIEW_COUNT FROM BOARD_TBL GROUP BY LIQUOR_ID) B
+			USING(LIQUOR_ID)
+			ORDER BY LIQUOR_ID DESC
+		) SUB
+
+
+	</select>
+	<select id="getPopularLiquor" resultType="LiquorDetail">
+		SELECT * FROM
+		(
+			SELECT * FROM
+			(SELECT LIQUOR_ID, LIQUOR_NAME, ALCHOL_CONTENT, LIQUOR_TYPE, LIQUOR_PRICE, LIQUOR_CAPACITY, L_CREATE_DATE, L_UPDATE_DATE, BREWERY_ID, BREWERY_NAME, BREWERY_LOCAL
+			FROM LIQUOR_TBL
+			LEFT OUTER JOIN BREWERY_TBL
+				ON LIQUOR_TBL.BREWERY_ID = BREWERY_TBL.BREWERY_NO
+			) A
+			LEFT OUTER JOIN
+			(SELECT LIQUOR_ID, ROUND(AVG(BOARD_POINT), 2) AVG_POINT, COUNT(*) REVIEW_COUNT FROM BOARD_TBL GROUP BY LIQUOR_ID) B
+			USING(LIQUOR_ID)
+			ORDER BY REVIEW_COUNT DESC NULLS LAST
+		) SUB
+		WHERE ROWNUM &lt;= 6
+
+	</select>
+	
+	<select id="detailSearchTotalCount">
+		SELECT COUNT(*)
+		FROM LIQUOR_TBL
+		LEFT OUTER JOIN BREWERY_TBL
+			ON LIQUOR_TBL.BREWERY_ID = BREWERY_TBL.BREWERY_NO
+			<where>
+				<if test="sInfo.keyword != null and sInfo.keyword !=''">
+					AND LIQUOR_NAME LIKE '%'||#{sInfo.keyword}||'%'
+				</if>
+				<if test="sInfo.breweryLocal != 'all' and sInfo.breweryLocal != null">
+					AND BREWERY_LOCAL = #{sInfo.breweryLocal}
+				</if>
+				<if test="sInfo.liquorType != 'all' and sInfo.liquorType != null">
+					AND LIQUOR_TYPE = #{sInfo.liquorType}
+				</if>
+				<if test="sInfo.alcholMin != null">
+					AND ALCHOL_CONTENT &gt;= #{sInfo.alcholMin}
+				</if>
+				<if test="sInfo.alcholMax != null">
+					AND ALCHOL_CONTENT &lt;= #{sInfo.alcholMax}
+				</if>
+				<if test="sInfo.capacityMin != null">
+					AND LIQUOR_CAPACITY &gt;= #{sInfo.capacityMin}
+				</if>
+				<if test="sInfo.capacityMax != null">
+					AND LIQUOR_CAPACITY &lt;= #{sInfo.capacityMax}
+				</if>
+				<if test="sInfo.priceMin != null">
+					AND LIQUOR_PRICE &gt;= #{sInfo.priceMin}
+				</if>
+				<if test="sInfo.priceMax != null">
+					AND LIQUOR_PRICE &lt;= #{sInfo.priceMax}
+				</if>
+				
+				<if test="tags != null">
+				AND LIQUOR_ID IN
+				(SELECT LIQUOR_ID
+				FROM LIQUOR_TBL L
+				LEFT OUTER JOIN (
+					SELECT BOARD_TAG_NAME, LIQUOR_ID
+					FROM BOARD_TAG_TBL
+					LEFT OUTER JOIN BOARD_TBL
+					USING(BOARD_NO)
+				) T
+				USING(LIQUOR_ID)
+				WHERE
+						T.BOARD_TAG_NAME IN
+						<foreach item="tag" collection="tags" open="(" separator="," close=")">
+							#{tag}
+						</foreach>
+				GROUP BY LIQUOR_ID
+					HAVING COUNT(BOARD_TAG_NAME) >= #{tagLength}
+				)
+			</if>
+		</where>
+
+	</select>
+	
+	<select id="searchTagsByLiquorId" resultType="LiquorTagInfo">
+		SELECT BOARD_TAG_NAME TAG_NAME, COUNT(*) TAG_COUNT
+		FROM
+		(SELECT * FROM
+		BOARD_TBL
+		WHERE LIQUOR_ID = #{liquorId})
+		LEFT OUTER JOIN BOARD_TAG_TBL
+		USING (BOARD_NO)
+		WHERE BOARD_TAG_NAME IS NOT NULL
+		GROUP BY BOARD_TAG_NAME
+	</select>
+	
+	<select id="searchImageByLiquorId" resultType="LiquorImage">
+		SELECT * FROM LIQUOR_IMAGE_TBL
+		WHERE LIQUOR_ID = #{liquorId}
+		ORDER BY FILE_RENAME ASC
+	</select>
+	
+	<select id="getAiSearchInfo" resultType="AiSearchInfo">
+		SELECT 
+		    L.LIQUOR_ID,
+		    L.LIQUOR_NAME,
+		    L.ALCHOL_CONTENT,
+		    L.LIQUOR_PRICE,
+		    L.LIQUOR_TYPE,
+		    L.LIQUOR_CAPACITY||'ml' LIQUOR_CAPACITY,
+		    LISTAGG(T.TAG_INFO, ', ') WITHIN GROUP (ORDER BY T.TAG_COUNT DESC, T.TAG_NAME) AS TAGS
+		FROM LIQUOR_TBL L
+		LEFT JOIN (
+		    SELECT 
+		        LIQUOR_ID, 
+		        BOARD_TAG_NAME AS TAG_NAME, 
+		        COUNT(*) AS TAG_COUNT,
+		        BOARD_TAG_NAME || '(' || COUNT(*) || ')' AS TAG_INFO
+		    FROM BOARD_TBL
+		    LEFT OUTER JOIN BOARD_TAG_TBL USING (BOARD_NO)
+		    WHERE BOARD_TAG_NAME IS NOT NULL
+		    AND LIQUOR_ID IS NOT NULL
+		    GROUP BY LIQUOR_ID, BOARD_TAG_NAME
+		) T ON L.LIQUOR_ID = T.LIQUOR_ID
+		GROUP BY L.LIQUOR_ID, L.LIQUOR_NAME, L.ALCHOL_CONTENT, L.LIQUOR_PRICE, L.LIQUOR_TYPE, L.LIQUOR_CAPACITY
+		ORDER BY L.LIQUOR_ID ASC
+	</select>
+	
+	<insert id="insertLiquorImage">
+		INSERT INTO LIQUOR_IMAGE_TBL
+		VALUES(SEQ_LIQUOR_IMAGE_NO.NEXTVAL, #{fileName}, #{fileRename}, #{filePath}, #{liquorId})
+	</insert>
+</mapper>

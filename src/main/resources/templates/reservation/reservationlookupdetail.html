@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>관리자 세부사항</title>
+<link rel="stylesheet"
+	href="/css/reservation/reservationlookupdetail.css">
+<link
+	href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap"
+	rel="stylesheet">
+</head>
+<body>
+	<header>
+		<div class="header-top">
+			<div style="width: 100px;"></div>
+			<a href="/" class="logo-link">
+				<div id="logo-container">
+					<img src="../../img/logo.png" alt="" id="logo">
+					<h1>술길따라</h1>
+				</div>
+			</a>
+			<div class="user-actions">
+				<div class="dropdown" th:if="${session.userId != null}">
+					<a href="#" class="icon-user" id="userMenuToggle"> <img
+						class="header-img" src="/img/free-icon-user-17095347.png"
+						alt="사용자 아이콘">
+					</a>
+					<div class="mypage-content" id="mypageDropdown">
+						<span class="user-name" th:text="${session.userName} + '님'"></span>
+						<hr>
+						<a href="/user/update">마이페이지</a> <a href="/user/logout">로그아웃</a> <a
+							href="/reservation/search">예약조회</a>
+					</div>
+				</div>
+				<div th:if="${session.userId == null}">
+					<a href="/user/login" class="icon-user"> <img
+						class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+					</a>
+				</div>
+				<a href="#" class="icon-menu"> <img class="header-img"
+					src="/img/free-icon-menu-3856832.png" alt="">
+				</a>
+			</div>
+		</div>
+		<nav>
+			<ul>
+				<li><a href="/brewery/admin/list">양조장 정보</a></li>
+                <li><a href="/liquor/list">술 정보</a></li>
+                <li><a href="/reservation/searchListAdmin">투어 예약 정보</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<th:block th:each="Reservation: ${rList}">
+			<div class="main">
+				<div class="main-top">
+					<div class="main-top-left">
+						<div class="Info">
+							<h3>예약 세부정보</h3>
+							<div class="paymentInfo">[카카오페이] 간편결제를 통한 지불
+								([[${Reservation.reserveNo}]]),
+								[[${Reservation.reserveCompleteTime}]] 결제</div>
+							<div class="Info-Div">
+								<div class="General">일반</div>
+								<div class="Info">정보</div>
+								<div class="state">상태</div>
+							</div>
+							<div class="detail-Info">
+								<div class="Info">
+									<div class="Info-title">생성날짜</div>
+									<div class="info-content">[[${Reservation.joinDate}]]</div>
+									<div class="Info-title">이메일</div>
+									<div class="info-content">[[${Reservation.email}]]</div>
+								</div>
+
+								<div class="Info">
+									<div class="Info-title">고객</div>
+									<div class="info-content">[[${Reservation.userId}]]</div>
+									<div class="Info-title">전화번호</div>
+									<div class="info-content">[[${Reservation.phone}]]</div>
+								</div>
+								<div class="Info">
+									<div class="Info-title">예약 상태</div>
+									<div class="info-content">완료</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="main-top-right">
+						<div class="creditTitle">
+							<h2>결제 내역</h2>
+						</div>
+						<div class="creditContent">
+							결제정보: [카카오페이] 간편결제<br> 승인 일시 :
+							[[${Reservation.reserveCompleteTime}]]
+						</div>
+					</div>
+				</div>
+				<div class="main-bottom">
+					<table>
+						<thead>
+							<tr>
+								<th>이미지</th>
+								<th>양조장 명</th>
+								<th>투어 명</th>
+								<th>비용</th>
+								<th>수량</th>
+								<th>총계</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><img th:src="@{${ImagePath}}" alt="Brewery Image" /></td>
+								<td>[[${Reservation.breweryName}]]</td>
+								<td>[[${Reservation.tourName}]]</td>
+								<td>[[${Reservation.tourPrice}]]원</td>
+								<td>[[${Reservation.visitorNum}]]</td>
+								<td>[[${Reservation.tourPrice * Reservation.visitorNum}]]원</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</th:block>
+	</main>
+	<footer>
+		<nav>
+			<a href="#">이용약관</a> | <a href="#">개인정보처리방침</a> | <a href="#">사이트맵</a>
+		</nav>
+		<div class="company-info">
+			<p>상호 : 술길따라 | 대표이사 : 김정욱 | 설립일 : 2024년 8월 26일 | 개인정보관리책임자 : 홍예은</p>
+			<p>문의 : jwkim@gmail.com | 사업자등록번호 : 111-22-33333 | 서울시 중구 남대문로
+				120</p>
+		</div>
+		<div class="social-icons">
+			<a href="#" class="icon-facebook"><img
+				src="/img/free-icon-facebook-circular-logo-20673.png" alt=""></a>
+			<a href="#" class="icon-instagram"><img
+				src="/img/free-icon-instagram-4922972.png" alt=""></a>
+		</div>
+		<p class="copyright">Copyright 2024 Sulgilddara Inc. | All Rights
+			Reserved</p>
+	</footer>
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const userMenuToggle = document.getElementById('userMenuToggle');
+			const mypageDropdown = document.getElementById('mypageDropdown');
+
+			if (userMenuToggle && mypageDropdown) {
+				userMenuToggle.addEventListener('click', function(e) {
+					e.preventDefault();
+					mypageDropdown.classList.toggle('show');
+				});
+
+				// 드롭다운 외부 클릭 시 닫기
+				window.addEventListener('click', function(e) {
+					if (!e.target.matches('.icon-user')
+							&& !e.target.matches('.header-img')) {
+						if (mypageDropdown.classList.contains('show')) {
+							mypageDropdown.classList.remove('show');
+						}
+					}
+				});
+			}
+		});
+	</script>
+</body>
+</html>

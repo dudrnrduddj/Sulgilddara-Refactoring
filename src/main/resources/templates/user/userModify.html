@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>술길따라</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/user/userModify.css">
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <div style="width: 100px;;"></div>
+            <a href="/" class="logo-link">
+	            <div id="logo-container">
+	                <img src="../img/logo.png" alt="" id="logo">
+		            <h1>술길따라</h1>
+	            </div>
+            	</a>
+            <div class="user-actions">
+	            <div class="dropdown" th:if="${session.userId != null}">
+        			<a href="#" class="icon-user" id="userMenuToggle">
+            			<img class="header-img" src="/img/free-icon-user-17095347.png" alt="사용자 아이콘">
+        			</a>
+        			<div class="mypage-content" id="mypageDropdown">
+        				<span class="user-name" th:text="${session.userName} + '님'"></span>
+        					<hr>
+            			<a href="/user/update">마이페이지</a>
+            			<a href="/user/logout">로그아웃</a>
+            			<a href="/reservation/search">예약조회</a>
+        			</div>
+    			</div>
+    			<div th:if="${session.userId == null}">
+    				<a href="#" class="icon-user">
+	                	<img class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+	                </a>
+	            </div>
+               	<a href="#" class="icon-menu">
+                	<img class="header-img" src="/img/free-icon-menu-3856832.png" alt="">
+                </a>
+            </div>
+        	</div>
+        <nav>
+            <ul>
+                <li><a href="/#story">술길따라 이야기</a></li>
+                <li><a href="/brewery/">양조장 탐방</a></li>
+                <li><a href="/liquor/search">술 도감</a></li>
+                <li><a href="/reservation/list">투어 예약</a></li>
+                <li><a href="/board/listCard">술 이야기</a></li>
+            </ul>
+        </nav>
+    </header>
+<main>
+    <aside>
+    <div id="aside-main">
+        <div id="aside-content">
+            <span>마이페이지</span>
+            <hr  class="mypage-header">
+            <ul>
+                <li><a href="/user/update" class="active">회원정보 수정</a></li>
+                <li><a href="/user/reservation">체험 예약 리스트</a></li>
+                <li><a href="/user/review">내가 쓴 리뷰</a></li>
+                <li><a href="/user/delete">회원 탈퇴</a></li>
+            </ul>
+        </div>
+    </div>
+</aside>
+	<section class="modify-section">
+    	<h2>회원정보 수정</h2>
+    	<div class="modify-form">
+    	<form action="#" th:action="@{/user/update}" method="post" enctype="multipart/form-data" th:object="${user}">
+            <ul>
+                <li>
+					<div class="profile" th:if="${user.loginType == 'KAKAO'}">
+				        <div th:if="${user.kakaoProfile != null}">
+				            <img id="kakaoPreview" th:src="${user.kakaoProfile}" alt="카카오 프로필 사진" style="width: 150px; height: auto;">
+				        </div>
+				    </div>
+                     <div class="profile" th:if="${user.loginType != 'KAKAO'}">
+	                    
+	                	<div th:if="${user.userFile != null}">
+	                        <img id="preview" th:src="@{|${user.userFile.filePath}${user.userFile.fileRename}|}" alt="미리보기 이미지" style="width: 150px; height: auto;">
+	                    </div>
+	                    <div  th:if="${user.userFile == null}">
+	                        <img id="preview" src="/img/user/default_profile.png" alt="미리보기 이미지" style="width: 200px; height: auto;">
+	                    </div>
+	                 </div>
+	                 <div id="file-upload">
+		                 <label for="profileImage">
+	                      	<div class="btn-upload">파일 업로드하기</div>
+	                      </label>
+	                 	<input type="file" name="reloadFile" id="profileImage" accept="image/*" onchange="previewImage(event)" style="display: none;">
+	                 </div>
+                </li>
+                 <li>
+                    <label>아이디 <span class="required">*</span></label>
+                    <input type="text" name="userId" th:field="*{userId}" placeholder="아이디를 입력해주세요" readonly>
+                    <div th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}"></div>
+                </li>
+                <li>
+                    <label>새 비밀번호 <span class="required">*</span></label>
+                    <input type="password" name="userPw" th:field="*{userPw}" placeholder="비밀번호를 입력해주세요">
+                    <div th:if="${#fields.hasErrors('userPw')}" th:errors="*{userPw}"></div>
+                </li>
+                <li>
+                    <label>새 비밀번호 확인 <span class="required">*</span></label>
+                    <input type="password" name="confirm_userPw" th:field="*{confirm_userPw}" placeholder="비밀번호를 한번 더 입력해주세요">
+                    <div th:if="${#fields.hasErrors('confirm_userPw')}" th:errors="*{confirm_userPw}"></div>
+                </li>
+                
+                <li>
+                    <label>이름 <span class="required">*</span></label>
+                    <input type="text" name="userName" th:field="*{userName}" placeholder="이름을 입력해주세요" readonly>
+                    <div th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}"></div>
+                </li>
+                <li>
+                    <label>이메일 <span class="required">*</span></label>
+                    <input type="text" name="email" th:field="*{email}">
+                    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+                </li>
+                <li>
+                    <label>성별</label>
+                    <div id="gender-check">
+						<div class="gender-radio"><input type="radio" name="gender" value="male" th:field="*{gender}" readonly> 남자 </div>
+						<div class="gender-radio"><input type="radio" name="gender" value="female" th:field="*{gender}" readonly> 여자</div>
+                    </div>
+                </li>
+                <li>
+                    <label>휴대폰</label>
+                    <input type="text" name="phone" th:field="*{phone}">
+                </li>
+                <li>
+                    <label>주소</label>
+                    <input type="text" name="address" th:field="*{address}">
+                </li>
+            </ul>
+        <button type="submit">수정하기</button>
+    </form>
+    </div>
+    </section>
+    </main>
+     <footer>
+        <nav>
+            <a href="#">이용약관</a> |
+            <a href="#">개인정보처리방침</a> |
+            <a href="#">사이트맵</a>
+        </nav>
+        <div class="company-info">
+            <p>상호 : 술길따라 | 대표이사 : 김정욱 | 설립일 : 2024년 8월 26일 | 개인정보관리책임자 : 홍예은</p>
+            <p>문의 : jwkim@gmail.com | 사업자등록번호 : 111-22-33333 | 서울시 중구 남대문로 120</p>
+        </div>
+        <div class="social-icons">
+            <a href="#" class="icon-facebook"><img src="/img/free-icon-facebook-circular-logo-20673.png" alt=""></a>
+            <a href="#" class="icon-instagram"><img src="/img/free-icon-instagram-4922972.png" alt=""></a>
+        </div>
+        <p class="copyright">Copyright 2024 Sulgilddara Inc. | All Rights Reserved</p>
+    </footer>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userMenuToggle = document.getElementById('userMenuToggle');
+        const mypageDropdown = document.getElementById('mypageDropdown');
+
+        if (userMenuToggle && mypageDropdown) {
+            userMenuToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                mypageDropdown.classList.toggle('show');
+            });
+
+            // 드롭다운 외부 클릭 시 닫기
+            window.addEventListener('click', function(e) {
+                if (!e.target.matches('.icon-user') && !e.target.matches('.header-img')) {
+                    if (mypageDropdown.classList.contains('show')) {
+                        mypageDropdown.classList.remove('show');
+                    }
+                }
+            });
+        }
+    });
+
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function(){
+                var output = document.getElementById('preview');
+                output.src = reader.result;
+                //output.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.makjan.sulgilddara.board.model.mapper.BoardMapper">
+  
+  	<insert id="insertBoard" useGeneratedKeys="true">
+		<selectKey order="BEFORE" resultType="_int" keyProperty="boardNo">
+			SELECT SEQ_BOARD_NO.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO BOARD_TBL VALUES(#{boardNo}, #{boardSubject }, #{boardContent }, #{boardWriter}, DEFAULT, DEFAULT, DEFAULT, #{boardPoint}, #{liquorId}, #{userId}, #{liquorName})
+  	</insert>
+  
+  	
+  	<insert id="insertTag">
+  		INSERT INTO BOARD_TAG_TBL VALUES(SEQ_BOARD_TAG_NO.NEXTVAL, #{boardTagName}, #{boardNo})
+  	</insert>
+  	
+  	<insert id="insertBoardFile">
+  		INSERT INTO BOARD_FILE_TBL VALUES(SEQ_BOARD_FILE_NO.NEXTVAL, #{boardFileName}, #{boardFileRename}, #{boardFilePath}, #{boardNo}, #{tempId}, #{isThumbnail}, #{fileOwner}, DEFAULT)
+  	</insert>
+  	
+  	<update id="updateBoard">
+		UPDATE BOARD_TBL SET BOARD_SUBJECT=#{boardSubject}, BOARD_CONTENT=#{boardContent}, UPDATE_DATE=DEFAULT, BOARD_POINT=#{boardPoint}, LIQUOR_ID=#{liquorId}, LIQUOR_NAME=#{liquorName} WHERE BOARD_NO=#{boardNo}
+  	</update>
+  	
+  	<update id="updateBoardFile">
+  		UPDATE BOARD_FILE_TBL SET BOARD_FILE_NAME = #{boardFileName}, BOARD_FILE_RENAME = #{boardFileRename}, BOARD_FILE_PATH = #{boardFilePath} WHERE BOARD_NO = #{boardNo} AND IS_THUMBNAIL=#{isThumbnail}
+  	</update>
+  	
+  	<select id="selectBoardOne" resultType="Board">
+  		SELECT * FROM BOARD_TBL WHERE BOARD_NO = #{boardNo}
+  	</select>
+  	
+<!--   	게시글 키워드 검색 -->
+	<select id="selectBoardList" resultType="Board">
+	    SELECT *
+	    FROM (
+	        SELECT
+	            B.*,
+	            ROW_NUMBER() OVER (
+	                <choose>
+	                    <when test="orderSelectBox == 'viewCount'">
+	                        ORDER BY B.VIEW_COUNT DESC, B.BOARD_NO DESC
+	                    </when>
+	                    <when test="orderSelectBox == 'boardPoint'">
+	                        ORDER BY B.BOARD_POINT DESC, B.BOARD_NO DESC
+	                    </when>
+	                    <otherwise>
+	                        ORDER BY B.BOARD_DATE DESC, B.BOARD_NO DESC
+	                    </otherwise>
+	                </choose>
+	            ) AS RN
+	        FROM BOARD_TBL B
+	        <where>
+	            <if test="searchKeyword != null and searchKeyword != ''">
+	                <choose>
+	                    <when test="searchCondition == 'all'">
+	                        (
+	                            B.BOARD_WRITER LIKE '%' || #{searchKeyword} || '%'
+	                            OR B.BOARD_SUBJECT LIKE '%' || #{searchKeyword} || '%'
+	                            OR B.BOARD_CONTENT LIKE '%' || #{searchKeyword} || '%'
+	                        )
+	                    </when>
+	                    <when test="searchCondition == 'boardWriter'">
+	                        B.BOARD_WRITER LIKE '%' || #{searchKeyword} || '%'
+	                    </when>
+	                    <when test="searchCondition == 'boardSubject'">
+	                        B.BOARD_SUBJECT LIKE '%' || #{searchKeyword} || '%'
+	                    </when>
+	                    <when test="searchCondition == 'boardContent'">
+	                        B.BOARD_CONTENT LIKE '%' || #{searchKeyword} || '%'
+	                    </when>
+	                </choose>
+	            </if>
+	        </where>
+	    )
+	    WHERE RN BETWEEN #{startRow} AND #{endRow}
+	    ORDER BY RN
+	</select>
+
+  	
+<!--   	liquorId로 게시글 키워드 검색 -->
+  	<select id="selectBoardListByLiquorId" resultType="Board">
+	  	SELECT * FROM BOARD_TBL
+  		<where>
+  			<if test="liquorId != null">
+  				LIQUOR_ID LIKE #{liquorId}
+  			</if>
+  		</where>
+  	</select>
+	    
+<!-- 	</select> -->
+<!--  게시글 No 조회 - 태그 검색 -->
+	<select id="selectBoardByTags" resultType="_int">
+		SELECT BOARD_NO
+		FROM BOARD_TAG_TBL
+		WHERE BOARD_TAG_NAME IN
+		<foreach item="tag" collection="tagList" open="(" separator="," close=")">
+		  #{tag}
+		</foreach>
+		GROUP BY BOARD_NO
+		HAVING COUNT(DISTINCT BOARD_TAG_NAME) = #{tagCount}
+	</select>
+<!-- 간편검색용 -->
+	<select id="selectBoardsByBoardNos" resultType="Board">
+	   SELECT * 
+	   FROM BOARD_TBL
+	   WHERE BOARD_NO IN 
+	   <foreach item="boardNo" collection="boardNos" open="(" separator="," close=")">
+	       #{boardNo}
+	   </foreach>
+	   <choose>
+	       <when test="orderSelectBox == 'latest'">
+	           ORDER BY BOARD_DATE DESC
+	       </when>
+	       <when test="orderSelectBox == 'viewCount'">
+	           ORDER BY VIEW_COUNT DESC
+	       </when>
+	       <when test="orderSelectBox == 'boardPoint'">
+	           ORDER BY BOARD_POINT DESC
+	       </when>
+	       <otherwise>
+	           ORDER BY BOARD_DATE DESC <!-- 기본값 -->
+	        </otherwise>
+	    </choose>
+	</select>
+		
+
+  	
+  	<select id="getTotalCount" resultType="_int">
+		SELECT COUNT(*) FROM BOARD_TBL 
+		<where>
+			<if test="searchCondition == 'all' and searchKeyword != null">
+				BOARD_WRITER LIKE '%'||#{searchKeyword}||'%'
+				OR BOARD_SUBJECT LIKE '%'||#{searchKeyword}||'%'
+				OR BOARD_CONTENT LIKE '%'||#{searchKeyword}||'%'
+			</if>
+			<if test="searchCondition == 'boardWriter' and searchKeyword != null">
+				BOARD_WRITER LIKE '%'||#{searchKeyword}||'%'
+			</if>
+			<if test="searchCondition == 'boardSubject' and searchKeyword != null">
+				BOARD_SUBJECT LIKE '%'||#{searchKeyword}||'%'
+			</if>
+			<if test="searchCondition == 'boardContent' and searchKeyword != null">
+				BOARD_CONTENT LIKE '%'||#{searchKeyword}||'%'
+			</if>
+		</where>
+	</select>
+	
+	<select id="getTotalCountTag" resultType="_int">
+		SELECT COUNT(*) FROM BOARD_TBL JOIN BOARD_TAG_TBL USING(BOARD_NO)
+	</select>
+	
+	<select id="selectBoardTagList" resultType="BoardTag">
+		SELECT  * FROM BOARD_TAG_TBL
+	</select>
+	
+	<select id="selectBoardTagListDistinct" resultType="BoardTag">
+		SELECT BOARD_TAG_NAME, COUNT(*) AS BOARD_COUNT FROM BOARD_TAG_TBL GROUP BY BOARD_TAG_NAME ORDER BY BOARD_COUNT DESC
+	</select>
+	
+	<select id="selectBoardFileList" resultType="BoardFile">
+		SELECT * FROM BOARD_FILE_TBL
+	</select>
+	
+	<delete id="deleteTag">
+		DELETE FROM BOARD_TAG_TBL WHERE BOARD_NO=#{boardNo}
+	</delete>
+	
+	<insert id="insertBoardReply">
+		INSERT INTO BOARD_REPLY_TBL VALUES(SEQ_BOARD_REPLY_NO.NEXTVAL, #{replyWriter}, #{replyContent}, DEFAULT, DEFAULT, #{likeCount}, #{boardNo}, #{userId})
+	</insert>
+	
+	<select id="selectBoardReplyList" resultType="BoardReply">
+		SELECT * FROM BOARD_REPLY_TBL WHERE BOARD_NO = #{boardNo}
+	</select>
+	
+	<delete id="deleteReply">
+		DELETE FROM BOARD_REPLY_TBL WHERE REPLY_NO=#{replyNo}
+	</delete>
+	
+	<update id="updateReply">
+		UPDATE BOARD_REPLY_TBL SET REPLY_CONTENT=#{replyContent}, R_UPDATE_DATE=DEFAULT WHERE REPLY_NO=#{replyNo}
+	</update>
+	
+	<delete id="deleteBoard">
+		DELETE FROM BOARD_TBL WHERE BOARD_NO=#{boardNo}
+	</delete>
+	
+	<update id="increaseViewCount">
+		UPDATE BOARD_TBL SET VIEW_COUNT = VIEW_COUNT+1 WHERE BOARD_NO=#{boardNo}
+	</update>
+	
+	<select id="searchLiquorList" resultType="SearchLiquor">
+		SELECT * FROM LIQUOR_TBL JOIN LIQUOR_IMAGE_TBL USING(LIQUOR_ID) WHERE LIQUOR_NAME LIKE '%'||#{liquorName}||'%'
+	</select>
+	
+	<select id="selectBoardReplyUser" resultType="BoardReplyUser">
+		SELECT * FROM USER_TBL 
+		LEFT JOIN USER_FILE_TBL USING(USER_ID) 
+		LEFT JOIN BOARD_REPLY_TBL USING(USER_ID)
+		WHERE BOARD_NO=#{boardNo} ORDER BY R_UPDATE_DATE
+	</select>
+	
+	<select id="selectBoardFileListByNo" resultType = "BoardFile">
+		SELECT * FROM BOARD_FILE_TBL WHERE BOARD_NO=#{boardNo} AND IS_THUMBNAIL='Y'
+	</select>
+	
+	<select id="selectBoardTagListByNo" resultType = "BoardTag">
+		SELECT * FROM BOARD_TAG_TBL WHERE BOARD_NO=#{boardNo}
+	</select>
+	
+	
+	<select id="selectTagListByBoardNos" resultType="BoardTag">
+		SELECT * FROM BOARD_TAG_TBL WHERE BOARD_NO IN
+	   <foreach item="boardNo" collection="boardNos" open="(" separator="," close=")">
+	       #{boardNo}
+	   </foreach>
+	</select>
+	
+	<select id="selectFileListByBoardNos" resultType="BoardFile">
+		SELECT * FROM BOARD_FILE_TBL WHERE BOARD_NO IN
+	   <foreach item="boardNo" collection="boardNos" open="(" separator="," close=")">
+	       #{boardNo}
+	   </foreach>
+	   AND IS_THUMBNAIL = 'Y'
+	</select>
+	
+	<insert id="insertTempBoardFile">
+		INSERT INTO BOARD_FILE_TBL VALUES(SEQ_BOARD_FILE_NO.NEXTVAL, #{boardFileName}, #{boardFileRename}, #{boardFilePath}, #{boardNo}, #{tempId}, #{isThumbnail}, #{fileOwner}, DEFAULT)
+	</insert>
+	
+	<update id="updateTempIds">
+	  UPDATE BOARD_FILE_TBL
+	  SET board_no = #{boardNo}, temp_id = null
+	  WHERE temp_id IN
+	  <foreach collection="tempIdList" item="tempId" open="(" separator="," close=")">
+	    #{tempId}
+	  </foreach>
+	</update>
+	
+	<select id="selectEditorFilesByBoardNo" resultType="BoardFile">
+		SELECT * FROM BOARD_FILE_TBL WHERE BOARD_NO=#{boardNo} AND IS_THUMBNAIL='N'
+	</select>
+	
+	<delete id="deleteBoardFileByNo">
+		DELETE FROM BOARD_FILE_TBL WHERE BOARD_FILE_NO=#{boardFileNo}
+	</delete>
+	
+	<select id="selectUnusedTempFiles" resultType="BoardFile">
+		SELECT * FROM BOARD_FILE_TBL WHERE FILE_OWNER=#{fileOwner} AND BOARD_NO IS NULL AND TEMP_ID IS NOT NULL
+	</select>
+	
+	<select id="selectExpiredTempFiles" resultType="BoardFile">
+		SELECT * FROM BOARD_FILE_TBL WHERE BOARD_NO IS NULL 
+										AND TEMP_ID IS NOT NULL
+										AND CREATED_AT &lt; #{expirationHours}
+	</select>
+	
+	
+	<select id="selectAllBoardsForIndex" resultType="Board">
+	    SELECT *
+	    FROM BOARD_TBL
+	    ORDER BY BOARD_NO
+	</select>
+	
+	<select id="selectBoardsBySearchedBoardNos" resultType="Board">
+		SELECT * FROM BOARD_TBL 
+		WHERE BOARD_NO IN 
+			<foreach collection="boardNos"
+		             item="boardNo"
+		             open="("
+		             separator=","
+		             close=")">
+		        #{boardNo}
+		    </foreach>
+	</select>
+	
+  </mapper>
+  

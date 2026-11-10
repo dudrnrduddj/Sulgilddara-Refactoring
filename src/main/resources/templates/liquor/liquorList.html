@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>술길따라 - 주류 목록</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/liquor/liquorList.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+	        <div class="header-top">
+	            <div style="width: 100px;;"></div>
+	            	<a href="/" class="logo-link">
+		            <div id="logo-container">
+		                <img src="/img/logo.png" alt="" id="logo">
+			            <h1>술길따라</h1>
+		            </div>
+	            	</a>
+	            <div class="user-actions">
+		            <div class="dropdown" th:if="${session.userId != null}">
+	        			<a href="#" class="icon-user" id="userMenuToggle">
+	            			<img class="header-img" src="/img/free-icon-user-17095347.png" alt="사용자 아이콘">
+	        			</a>
+	        			<div class="mypage-content" id="mypageDropdown">
+	        				<span class="user-name" th:text="${session.userName} + '님'"></span>
+	        					<hr>
+	            			<a href="/user/update">마이페이지</a>
+	            			<a href="/user/logout">로그아웃</a>
+	            			<a href="/reservation/search">예약조회</a>
+	        			</div>
+	    			</div>
+	    			<div th:if="${session.userId == null}">
+	    				<a href="/user/login" class="icon-user">
+		                	<img class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+		                </a>
+		            </div>
+	               	<a href="#" class="icon-menu">
+	                	<img class="header-img" src="/img/free-icon-menu-3856832.png" alt="">
+	                </a>
+	            </div>
+	        	</div>
+	        <nav>
+	            <ul>
+	                <li><a href="/brewery/admin/list">양조장 정보</a></li>
+	                <li><a href="/liquor/list">술 정보</a></li>
+	                <li><a href="/reservation/searchListAdmin">투어 예약 정보</a></li>
+	            </ul>
+	        </nav>
+	    </header>
+
+        <nav>
+        </nav>
+        
+        <div class="content-wrapper">
+            <main class="main-content">
+
+		        <div class="search-filters">
+		        	<form action="/liquor/list" method="get">
+		        		<input name="cp" type="hidden" th:value="1">
+		        		
+		        		<table id="searchTable">
+						    <tr>
+						        <td>
+						            <!-- 검색 조건 선택 드롭다운 -->
+						            <select name="liquorType" id="liquorType">
+			                            <option value="all" th:selected="${liquorType == 'all'}")>전체</option>
+			                            <option value="전통주" th:selected="${liquorType == '전통주'}">전통주</option>
+			                            <option value="막걸리" th:selected="${liquorType == '막걸리'}">막걸리</option>
+			                            <option value="청주" th:selected="${liquorType == '청주'}">청주</option>
+			                            <option value="소주" th:selected="${liquorType == '소주'}">소주</option>
+			                            <option value="와인" th:selected="${liquorType == '와인'}">와인</option>
+			                            <option value="위스키" th:selected="${liquorType == '위스키'}">위스키</option>
+			                            <option value="맥주" th:selected="${liquorType == '맥주'}">맥주</option>
+			                            <option value="리큐르" th:selected="${liquorType == '리큐르'}">리큐르</option>
+			                            <option value="브랜디" th:selected="${liquorType == '브랜디'}">브랜디</option>
+										<option value="보드카" th:selected="${liquorType == '보드카'}">보드카</option>
+			                        </select>
+						        </td>
+						        <td>
+						            <!-- 입력 필드 표시 -->
+						            <div class="searchKeywordInputDiv">
+							            <input name="keyword" th:value=${keyword} class="searchKeywordInput" type="text" placeholder="검색어를 입력하세요">
+						            </div>
+						        </td>
+						        <td>
+						            <!-- 검색 버튼 -->
+						            <input type="submit" class="searchButton" value="검색">
+						        </td>
+						    </tr>
+						</table>
+		        		
+		        	</form>
+		        </div>
+		
+		        <table id="liquor-table">
+		            <thead>
+		                <tr>
+		                    <th>이미지</th>
+		                    <th>ID</th>
+							<th>제품명</th>
+							<th>도수</th>
+							<th>주종</th>
+							<th>가격</th>
+							<th>용량</th>
+							<th>양조장ID</th>
+							<th></th>
+							<th></th>
+		                </tr>
+		            </thead>
+		            <tbody>
+		                <tr th:each="liquor, iterStat : ${lList}" class="liquorRow">
+		                    <td><div class="liquor-image"  th:style="${'background-image: url(' + (#lists.isEmpty(imgList[iterStat.index]) ? 
+																									'/img/liquor/empty_bottle.png' : 
+																									(imgList[iterStat.index][0].filePath + imgList[iterStat.index][0].fileRename)) + 
+																									'); background-size: cover; background-position: center;'}"></div></td>
+							<td>[[${liquor.liquorId}]]</td>
+							<td><a th:href="@{/liquor/detail/{id}(id=${liquor.liquorId})}" th:text="${liquor.liquorName}"></a></td>
+		                    <td>[[${liquor.alcholContent}]]</td>
+							<td>[[${liquor.liquorType }]]</td>
+							<td>[[${liquor.liquorPrice }]]</td>
+							<td>[[${liquor.liquorCapacity }]]</td>
+							<td>[[${liquor.breweryId }]]</td>
+		                    <td>
+		                        <button onclick="location.href=this.getAttribute('data-href')" th:attr="data-href=@{/liquor/update/{id}(id=${liquor.liquorId})}" class="modifyButton">수정</button>
+		                    </td>
+		                    <td>
+		                        <button th:onclick="'if(confirm(\'정말 삭제하시겠습니까?\')) window.location.href=\'/liquor/delete/' + ${liquor.liquorId} + '\''" type="button" class="deleteButton">삭제</button>
+		               		</td>
+		                </tr>
+		            </tbody>
+		            <tfoot>
+						<tr align="center">
+							<td colspan="10" id="pagination">
+								<th:block th:each="p : ${#numbers.sequence(pn.startNavi, pn.endNavi)}">
+								    <span th:if="${p == cp}" th:text="${p}"></span>
+								    <a th:unless="${p == cp}" class="paginationLink" th:href="@{/liquor/list(cp=${p}, keyword=${keyword}, liquorType=${liquorType})}" th:text="${p}"></a>
+								</th:block>
+							</td>
+						</tr>
+					</tfoot>
+		        </table>
+		
+		
+		        <button onclick="location.href='/liquor/add'" class="insertButton">등록</button>
+	        </main>
+        </div>
+
+        <footer>
+	        <nav>
+	            <a href="#">이용약관</a> |
+	            <a href="#">개인정보처리방침</a> |
+	            <a href="#">사이트맵</a>
+	        </nav>
+	        <div class="company-info">
+	            <p>상호 : 술길따라 | 대표이사 : 김정욱 | 설립일 : 2024년 8월 26일 | 개인정보관리책임자 : 홍예은</p>
+	            <p>문의 : jwkim@gmail.com | 사업자등록번호 : 111-22-33333 | 서울시 중구 남대문로 120</p>
+	        </div>
+	        <div class="social-icons">
+	            <a href="#" class="icon-facebook"><img src="/img/free-icon-facebook-circular-logo-20673.png" alt=""></a>
+	            <a href="#" class="icon-instagram"><img src="/img/free-icon-instagram-4922972.png" alt=""></a>
+	        </div>
+	        <p class="copyright">Copyright 2024 Sulgilddara Inc. | All Rights Reserved</p>
+	    </footer>
+    </div>
+    
+    <script>
+	 document.addEventListener('DOMContentLoaded', function() {
+	        const userMenuToggle = document.getElementById('userMenuToggle');
+	        const mypageDropdown = document.getElementById('mypageDropdown');
+
+	        if (userMenuToggle && mypageDropdown) {
+	            userMenuToggle.addEventListener('click', function(e) {
+	                e.preventDefault();
+	                mypageDropdown.classList.toggle('show');
+	            });
+
+	            // 드롭다운 외부 클릭 시 닫기
+	            window.addEventListener('click', function(e) {
+	                if (!e.target.matches('.icon-user') && !e.target.matches('.header-img')) {
+	                    if (mypageDropdown.classList.contains('show')) {
+	                        mypageDropdown.classList.remove('show');
+	                    }
+	                }
+	            });
+	        }
+	    });
+	
+	</script>
+</body>
+</html>

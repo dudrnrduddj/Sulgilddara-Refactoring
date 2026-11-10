@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>술길따라</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/owlcarousel/owl.carousel.min.css">
+    <link rel="stylesheet" href="/css/owlcarousel/owl.theme.default.min.css">
+</head>
+<body>
+    <header>
+	        <div class="header-top">
+	            <div style="width: 100px;;"></div>
+	            	<a href="/" class="logo-link">
+		            <div id="logo-container">
+		                <img src="/img/logo.png" alt="" id="logo">
+			            <h1>술길따라</h1>
+		            </div>
+	            	</a>
+	            <div class="user-actions">
+		            <div class="dropdown" th:if="${session.userId != null}">
+	        			<a href="#" class="icon-user" id="userMenuToggle">
+	            			<img class="header-img" src="/img/free-icon-user-17095347.png" alt="사용자 아이콘">
+	        			</a>
+	        			<div class="mypage-content" id="mypageDropdown">
+	        				<span class="user-name" th:text="${session.userName} + '님'"></span>
+	        					<hr>
+	            			<a href="/user/update">마이페이지</a>
+	            			<a href="/user/logout">로그아웃</a>
+	            			<a href="/reservation/search">예약조회</a>
+	        			</div>
+	    			</div>
+	    			<div th:if="${session.userId == null}">
+	    				<a href="/user/login" class="icon-user">
+		                	<img class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+		                </a>
+		            </div>
+	               	<a href="#" class="icon-menu">
+	                	<img class="header-img" src="/img/free-icon-menu-3856832.png" alt="">
+	                </a>
+	            </div>
+	        	</div>
+	        <nav>
+	            <ul>
+	                <li><a href="/#story">술길따라 이야기</a></li>
+	                <li><a href="/brewery/">양조장 탐방</a></li>
+	                <li><a href="/liquor/search">술 도감</a></li>
+	                <li><a href="/reservation/list">투어 예약</a></li>
+	                <li><a href="/board/listCard">술 이야기</a></li>
+	            </ul>
+	        </nav>
+	    </header>
+
+    <main> 
+        <section id="popular-breweries">
+            <!-- <h2>인기있는 양조장</h2> -->
+            <div class="owl-carousel owl-theme">
+                <div class="carousel-item">
+                    <img class="owlCarousel-item" src="./img/와인동굴.png" alt="">
+                </div>
+                <div class="carousel-item">
+                    <img class="owlCarousel-item" src="./img/와인통 짱많.png" alt="">
+                </div>
+                <div class="carousel-item">
+                    <img class="owlCarousel-item" src="./img/그나마 시골.png" alt="">
+                </div>
+                
+                <div class="carousel-item">
+                    <img class="owlCarousel-item" src="./img/와인동굴인데 좀더 어두움.png" alt="">
+                </div>
+                <div class="carousel-item">
+                    <img class="owlCarousel-item" src="./img/한옥느낌.png" alt="">
+                </div>
+                
+                
+            </div>
+        </section>
+        
+        <section id="story">
+
+<!--             <h2 class="section-title">술길따라 이야기</h2> -->
+            <div class="story-content">
+                <h1>술길따라 - 국내 양조장과 주류 정보를 한 눈에</h1>
+                <h3>酒路依良</h3>
+    
+			    <p>"술길따라"는 국내 양조장과 다양한 주류 정보를 제공하는 플랫폼입니다. 사용자들은 이곳에서 직접 경험한 술에 대한 리뷰를 작성하고, 다른 사용자들과 소통하며 주류에 대한 깊이 있는 대화를 나눌 수 있습니다. 또한, 양조장 투어를 손쉽게 예약하고, AI 기반 주류 추천 서비스를 통해 새로운 술을 발견하는 재미를 느낄 수 있습니다.</p>
+			    
+			    <ul>
+			        <li><strong>국내 양조장 정보</strong>: 전국의 양조장 정보를 확인하고, 원하는 양조장을 찾아보세요.</li>
+			        <li><strong>주류 리뷰 커뮤니티</strong>: 다양한 술에 대한 솔직한 리뷰와 함께 소통할 수 있는 공간입니다.</li>
+			        <li><strong>양조장 투어 예약 서비스</strong>: 원하는 양조장 투어를 간편하게 예약할 수 있습니다.</li>
+			        <li><strong>AI 기반 주류 추천</strong>: 취향에 맞는 새로운 술을 추천받아 보세요.</li>
+			    </ul>
+			    
+			    <p>"술길따라"와 함께 술과 양조장을 더욱 가까이 만나보세요!</p>
+
+            </div>
+        </section>
+
+        <section id="brewery-tour">
+            <h2 class="section-title">인기 상품</h2>
+            	<div class="liquor-grid">
+				    <!-- Thymeleaf로 반복 처리 -->
+				    <div th:each="liquor, iterStat : ${liquorList}" class="liquor-item" th:onclick="'window.location.href=\'' + @{/liquor/detail/{id}(id=${liquor.liquorId})} + '\''">
+						<div class="liquor-image" th:style="${'background-image: url(' + (#lists.isEmpty(imgList[iterStat.index]) ? 
+																							'/img/liquor/empty_bottle.png' : 
+																							(imgList[iterStat.index][0].filePath + imgList[iterStat.index][0].fileRename)) + 
+																							'); background-size: cover; background-position: center;'}">
+						</div>
+				        <div class="liquor-info">
+				            <div class="rating" th:text="${liquor.avgPoint}">5.0</div>
+				            <h3 th:text="${liquor.liquorName}">술이름</h3>
+				            <div class="type" th:text="${liquor.liquorType}">주종</div>
+							<ul class="tagList tag-container">
+								<li th:each="tag : ${tagList[iterStat.index]}" th:text="${tag.tagName}+'('+${tag.tagCount}+')'" class="tag-item"></li>
+			                </ul>	
+				            <div class="stats">
+				                <span class="reviews" th:text="'★리뷰수 : '+${liquor.reviewCount}">★리뷰수</span>
+				            </div>
+				        </div>
+				    </div>
+				</div>
+        </section>
+    </main>
+
+    <footer>
+        <nav>
+            <a href="#">이용약관</a> |
+            <a href="#">개인정보처리방침</a> |
+            <a href="#">사이트맵</a>
+        </nav>
+        <div class="company-info">
+            <p>상호 : 술길따라 | 대표이사 : 김정욱 | 설립일 : 2024년 8월 26일 | 개인정보관리책임자 : 홍예은</p>
+            <p>문의 : jwkim@gmail.com | 사업자등록번호 : 111-22-33333 | 서울시 중구 남대문로 120</p>
+        </div>
+        <div class="social-icons">
+            <a href="#" class="icon-facebook"><img src="./img/free-icon-facebook-circular-logo-20673.png" alt=""></a>
+            <a href="#" class="icon-instagram"><img src="./img/free-icon-instagram-4922972.png" alt=""></a>
+        </div>
+        <p class="copyright">Copyright 2024 Sulgilddara Inc. | All Rights Reserved</p>
+    </footer>
+
+    <script src="/css/owlcarousel/jquery.min.js"></script>
+    <script src="/css/owlcarousel/owl.carousel.min.js"></script>
+
+    <script type="text/javascript">
+        $('.owl-carousel').owlCarousel({
+            loop:true,
+            margin:8,
+            nav:false,
+            autoplay:true,
+            autoplayTimeout:2000,
+            autoplayHoverPause:true,
+            
+            responsive:{
+                0:{
+                    items:1
+                },
+                600:{
+                    items:1
+                },
+                1000:{
+                    items:1
+                }
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+			const userMenuToggle = document.getElementById('userMenuToggle');
+			const mypageDropdown = document.getElementById('mypageDropdown');
+			
+			if (userMenuToggle && mypageDropdown) {
+			    userMenuToggle.addEventListener('click', function(e) {
+			        e.preventDefault();
+			        mypageDropdown.classList.toggle('show');
+			    });
+			
+			    // 드롭다운 외부 클릭 시 닫기
+			    window.addEventListener('click', function(e) {
+			        if (!e.target.matches('.icon-user') && !e.target.matches('.header-img')) {
+			            if (mypageDropdown.classList.contains('show')) {
+			                mypageDropdown.classList.remove('show');
+			            }
+			        }
+			    });
+			}
+		});
+    </script>
+</body>
+</html>

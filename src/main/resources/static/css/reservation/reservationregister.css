@@ -1,0 +1,470 @@
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body, html {
+	font-family: 'Noto Serif KR', serif;
+	font-size: 10px;
+}
+/* header */
+header {
+	background-color: white;
+	padding: 20px;
+}
+
+.header-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 90vw;
+	margin: 0 auto;
+	margin-bottom: 25px;
+}
+
+h1 {
+	font-size: 40px;
+	font-weight: 800;
+	margin-top: 8px;
+}
+
+nav ul {
+	list-style-type: none;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	gap: 10px;
+}
+
+nav ul li a {
+	text-decoration: none;
+	color: black;
+	font-size: 18px;
+}
+
+.user-actions {
+	display: flex;
+}
+
+.icon-user, .icon-menu {
+	width: 50px;
+	height: 50px;
+}
+
+.user-actions img {
+	width: 30px;
+	height: 30px;
+}
+
+/* footer */
+footer {
+	background-color: white;
+	padding: 50px 20px;
+	text-align: center;
+}
+
+footer nav {
+	margin-bottom: 20px;
+}
+
+footer nav a {
+	text-decoration: none;
+	color: black;
+	font-size: 15px;
+}
+
+.company-info {
+	font-size: 13px;
+	line-height: 1.5;
+	margin-bottom: 20px;
+}
+
+.social-icons {
+	display: flex;
+	justify-content: center;
+	gap: 20px;
+	margin-bottom: 20px;
+}
+
+.icon-facebook, .icon-instagram {
+	width: 40px;
+	height: 40px;
+}
+
+.social-icons img {
+	width: 100%;
+}
+
+.copyright {
+	font-size: 10px;
+}
+
+@media ( min-width : 768px) {
+	h1 {
+		font-size: 40px;
+	}
+	.user-actions img {
+		width: 40px;
+		height: 40px;
+		margin: auto;
+	}
+	#logo {
+		width: 60px;
+		height: 60px;
+	}
+	.story-image {
+		width: 60%;
+		height: 400px;
+	}
+	.tour-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+	.tour-item {
+		height: 300px;
+	}
+}
+
+#logo {
+	width: 50px;
+	height: 50px;
+}
+
+@media ( min-width : 1024px) {
+	.header-img {
+		margin: 10px 20px;
+		flex: 1;
+		min-width: 0;
+	}
+	.user-actions {
+		display: flex;
+		gap: 20px;
+	}
+	.icon-user {
+		display: inline-block;
+		width: 50px;
+		height: 50px;
+	}
+	.user-actions img {
+		width: 50px;
+		height: 50px;
+	}
+	h1 {
+		font-size: 40px;
+	}
+	#logo {
+		width: 80px;
+		height: 80px;
+	}
+	main {
+		padding: 0;
+	}
+	#popular-breweries {
+		height: 70vh;
+	}
+	.story-image {
+		height: 500px;
+	}
+	.tour-item {
+		height: 350px;
+	}
+}
+
+#logo {
+	border-radius: 25%;
+	margin: auto 10px;
+}
+
+#logo-container {
+	display: flex;
+	flex-direction: row;
+}
+
+.header-img {
+	margin: 10px 10px;
+	flex: 1;
+	min-width: 0;
+}
+
+.icon-user {
+	display: inline-block;
+	width: 50px;
+	height: 50px;
+}
+
+/* 네비게이션 바 추가 - 여기서부터 추가*/
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.icon-user {
+	cursor: pointer;
+}
+
+.header-img {
+	width: 30px;
+	height: 30px;
+}
+
+.mypage-content {
+	display: none;
+	position: absolute;
+	background-color: #F9F9F9;
+	min-width: 120px;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+	z-index: 2;
+	right: 0;
+	font-size: 13px;
+	font-weight: 400;
+	--text-align: center;
+}
+
+.mypage-content a {
+	color: black;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
+}
+
+.mypage-content a:hover {
+	background-color: #f1f1f1;
+}
+
+.show {
+	display: block;
+}
+
+.user-name {
+	padding: 12px 16px;
+	display: block;
+}
+
+.logo-link {
+	text-decoration: none; /* 링크의 밑줄 제거 */
+	color: inherit; /* 링크의 색상 제거 */
+}
+
+ul, ol {
+	list-style: none;
+}
+
+a {
+	text-decoration: none
+}
+
+.breweryInfo {
+	margin-bottom: 20px;
+}
+
+.breweryTitle {
+	font-size: 30px;
+	font-weight: bold;
+	margin-bottom: 20px;
+}
+
+.Info {
+	font-size: 20px;
+	font-weight: bold;
+	font-weight: bold;
+}
+
+.tourTitle {
+	font-size: 15px;
+	font-weight: 800;
+}
+
+.tour-Info {
+	display: flex;
+}
+
+.tourPriceAndTime {
+	font-size: 15px;
+	font-weight: 800;
+}
+
+.reservationDate {
+	margin-bottom: 20px;
+	max-width: 1000px;
+	margin: 0 auto;
+}
+
+.reservationDate h3 {
+	font-size: 20px;
+}
+
+.DateData table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+}
+
+.DateData td:hover {
+	background-color: #f0f0f0;
+	cursor: pointer;
+}
+
+.DateData th, .DateData td {
+	border: 1px solid #ddd;
+	padding: 8px;
+	text-align: center;
+}
+
+.DateData td.selected {
+	background-color: #007bff;
+	color: white;
+}
+
+.DateData .header {
+	background-color: #4CAF50;
+	color: white;
+}
+
+.DateData .header button {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 16px;
+	cursor: pointer;
+}
+
+main h1, main h3 {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+fieldset {
+	border: 1px solid #ddd;
+	padding: 15px;
+	margin-top: 20px;
+}
+
+legend {
+	font-weight: bold;
+}
+
+input[type="number"], select, input[type="tel"] {
+	width: 100%;
+	padding: 8px;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	box-sizing: border-box;
+}
+
+.emergency span {
+	font-size: 12px;
+	color: #666;
+}
+
+button[type="submit"] {
+	background-color: #4CAF50;
+	color: white;
+	padding: 10px 20px;
+	border: none;
+	cursor: pointer;
+	margin-top: 20px;
+	border-radius: 5px;
+}
+
+button[type="submit"]:hover {
+	background-color: #45a049;
+}
+
+.reservation-info {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 20px;
+	background-color: #f9f9f9;
+	border-radius: 8px;
+	height: 230px;
+}
+
+.reservation-info1 {
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: 20px;
+	background-color: #f9f9f9;
+	border-radius: 8px;
+	height: 380px;
+}
+
+.reservation-info h2 {
+	margin-bottom: 20px;
+	color: #333;
+}
+
+.reservation-info1 h2 {
+	font-size: 20px;
+	margin-bottom: 20px;
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 5px;
+	color: #666;
+	font-size: 15px;
+}
+
+.form-group input, .form-group select {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	font-size: 16px;
+}
+
+.form-group input[type="number"] {
+	width: 100px;
+}
+
+.form-group select {
+	appearance: none;
+	background-image:
+		url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+	background-repeat: no-repeat;
+	background-position-x: 98%;
+	background-position-y: 50%;
+}
+
+.info-text {
+	margin-top: 5px;
+	font-size: 14px;
+	color: #ff0000;
+}
+
+/* 추가적인 반응형 스타일 */
+@media ( max-width : 600px) {
+	.reservation-info {
+		padding: 10px;
+	}
+	.form-group input, .form-group select {
+		font-size: 14px;
+	}
+}
+
+.buttondiv {
+	max-width: 1000px;
+	margin: 0 auto;
+}
+
+#reserveButton {
+	width: 100%;
+}
+
+.DateData {
+	margin-bottom: 10px;
+}
+
+#reserveDate {
+	font-size: 18px;
+	font-weight: bold;
+	color: #333;
+	margin-top: 15px;
+	display: block;
+	border-bottom: 1px solid gray;
+	margin-bottom: 30px;
+}

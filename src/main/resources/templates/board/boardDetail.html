@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org" >
+	<head>
+		<meta charset="UTF-8">
+		<title>술 이야기 상세</title>
+		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+		<script src="https://kit.fontawesome.com/7d4169cb69.js" crossorigin="anonymous"></script>
+		
+		<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="/css/board/header.css">
+		<link rel="stylesheet" href="/css/board/boardDetail.css">
+		<link rel="stylesheet" href="/css/board/footer.css">
+		<style type="text/css">
+			
+		</style>
+	</head>
+	<body>
+		<header>
+	        <div class="header-top">
+	            <div style="width: 100px;;"></div>
+	            	<a href="/" class="logo-link">
+		            <div id="logo-container">
+		                <img src="/img/logo.png" alt="" id="logo">
+			            <h1>술길따라</h1>
+		            </div>
+	            	</a>
+	            <div class="user-actions">
+		            <div class="dropdown" th:if="${session.userId != null}">
+	        			<a href="#" class="icon-user" id="userMenuToggle">
+	            			<img class="header-img" src="/img/free-icon-user-17095347.png" alt="사용자 아이콘">
+	        			</a>
+	        			<div class="mypage-content" id="mypageDropdown">
+	        				<span class="user-name" th:text="${session.userName} + '님'"></span>
+	        					<hr>
+	            			<a href="/user/update">마이페이지</a>
+	            			<a href="/user/logout">로그아웃</a>
+	            			<a href="/reservation/search">예약조회</a>
+	        			</div>
+	    			</div>
+	    			<div th:if="${session.userId == null}">
+	    				<a href="/user/login" class="icon-user">
+		                	<img class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+		                </a>
+		            </div>
+	               	<a href="#" class="icon-menu">
+	                	<img class="header-img" src="/img/free-icon-menu-3856832.png" alt="">
+	                </a>
+	            </div>
+	        	</div>
+	        <nav>
+	            <ul>
+	                <li><a href="/#story">술길따라 이야기</a></li>
+	                <li><a href="/brewery/">양조장 탐방</a></li>
+	                <li><a href="/liquor/search">술 도감</a></li>
+	                <li><a href="/reservation/list">투어 예약</a></li>
+	                <li><a href="/board/listCard">술 이야기</a></li>
+	            </ul>
+	        </nav>
+	    </header>
+		
+		<div id="detailContainer">
+			<div style="border-bottom: 2px solid gray; margin: 15px 0; padding-bottom: 15px; display: flex; justify-content: space-between;">
+				<span style="font-size: 20px; font-style: italic;"># 술 이야기</span>
+				<button id="detail-modifyBtn" type="button" th:onclick="showModifyPage(/*[[${board.boardNo}]]*/);">수정</button>
+			</div>
+			<div id="detail-subject" th:text="'['+${board.liquorName}+'] '+${board.boardSubject}"></div>
+
+			<div id="detail-infoBox">
+				<div>
+					<span style="color: gray; font-weight: 800;">by </span>
+					<span style="margin-right: 20px; font-weight: 800;" th:text="${board.userId}"></span>
+					<span style="color: gray;" th:text="${#dates.format(board.boardDate, 'yyyy년 MM월 dd일')}"></span>
+				</div>
+				<div th:text="'조회수 : '+${board.viewCount}"></div>
+			</div>
+			<div id="detail-tagBox">
+				<a class="detail-tag" th:each="bTag : ${bTagList}" th:text="'# '+${bTag.boardTagName}" th:href="@{/board/searchTag_listCard(cp=1, searchMethod=tagSearch, orderSelectBox=latest, tagName=${bTag.boardTagName})}"></a>
+			</div>
+			
+			<div th:each="bFile : ${bFileList}">
+			썸네일 첨부파일 : 
+				<a style="color:gray;" title="다운로드" th:text="${bFile.boardFileRename}" th:href="@{|${bFile.boardFilePath}${bFile.boardFileRename}|}"></a>
+			</div>
+			
+			<div>
+				<div class="starContainer" th:if="${board.boardPoint == 0.5}"><i class="fa-solid fa-star-half"></i></div>
+	            <div class="starContainer"  th:if="${board.boardPoint == 1}"><i class="fa-solid fa-star"></i></div>
+	            <div class="starContainer"  th:if="${board.boardPoint == 1.5}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half"></i></div>
+	            <div class="starContainer"  th:if="${board.boardPoint == 2}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+	            <div class="starContainer"  th:if="${board.boardPoint == 2.5}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half"></i></div>
+	            <div class="starContainer"  th:if="${board.boardPoint == 3}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+	            <div class="starContainer"  th:if="${board.boardPoint == 3.5}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half"></i></div>
+	            <div class="starContainer"  th:if="${board.boardPoint == 4}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+	            <div class="starContainer"  th:if="${board.boardPoint == 4.5}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half"></i></div>
+	            <div class="starContainer"  th:if="${board.boardPoint == 5}"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+			</div>
+			
+			<div style="padding-bottom: 100px;" th:utext=${board.boardContent}></div>
+
+			<div id="detail-navi">
+				<div style="border-bottom:2px solid gray; padding-bottom:10px; margin-bottom: 10px;" th:if="${prevBoard != null}">
+					<a style="margin-right: 30px;" th:text="이전글" th:href="@{/board/detailPage/{boardNo}/yes(
+				       boardNo=${prevBoard.boardNo},
+				       searchKeyword=${searchKeyword},
+				       searchCondition=${searchCondition},
+				       orderSelectBox=${orderSelectBox},
+				       searchMethod=${searchMethod}
+				   )}"></a>
+					<a th:text="'['+${prevBoard.liquorName}+'] '+${prevBoard.boardSubject}" th:href="@{/board/detailPage/{boardNo}/{viewStatus}(boardNo=${prevBoard.boardNo}, viewStatus='yes')}"></a>
+				</div>
+				<div th:if="${nextBoard != null}">
+					<a style="margin-right: 30px;" th:text="다음글" th:href="@{/board/detailPage/{boardNo}/yes(
+				       boardNo=${nextBoard.boardNo},
+				       searchKeyword=${searchKeyword},
+				       searchCondition=${searchCondition},
+				       orderSelectBox=${orderSelectBox},
+				       searchMethod=${searchMethod}
+				   )}"></a>
+					<a th:text="'['+${nextBoard.liquorName}+'] '+${nextBoard.boardSubject}" th:href="@{/board/detailPage/{boardNo}/{viewStatus}(boardNo=${nextBoard.boardNo}, viewStatus='yes')}"></a>
+				</div>
+			</div>
+			<div style="display: flex; justify-content: flex-end; padding-right: 10px; margin-top: 10px; margin-bottom:20px;">
+				<button id="goListBtn" type="button" onclick="location.replace('/board/listCard');">목록</button>
+			</div>
+			<div id="replyAddContainer">
+				<div>
+					<input type="text" placeholder="댓글을 작성하세요" id="replyAddContent" >
+				</div>
+				<div style="display: flex; justify-content: flex-end;">
+					<button type="button" id="replyAddBtn">댓글 작성</button>
+				</div>
+			</div>
+			<div id="replyListContainer">
+				<div id="replyTotalCount" th:text="${replyTotalCount + '개의 댓글'}"></div>
+				
+				<div th:if="${!boardReplyUserList.isEmpty()}" id="replyOneContainer" th:each="reply : ${boardReplyUserList}">
+					<div id="replyContainer-top" style="position: relative;">
+	<!-- 				userId는 ajax를 통해 호출된 컨트롤러에서 model로 전달되는 값 -> board.userId를 의미하고있음 -->
+							<div id="replyBtnContainer" th:if="${loginUserId == reply.userId}">
+								<button type="button" th:onclick="convertUpdateMode(/*[[${reply.replyNo}]]*/);">수정</button>
+								<button type="button" th:onclick="if(confirm('정말 삭제하시겠습니까?')) removeReply(/*[[${reply.replyNo}]]*/);">삭제</button>
+							</div>
+						<div style="width: 55px; height: 55px; ">
+							<th:block  th:if="${reply.kakaoProfile == null and reply.userFileRename != null}">
+								<img alt="프로필" th:src="@{|${reply.userFilePath}/${reply.userFileRename}}|" style="width: 55px; height: 55px; border-radius: 50%">
+							</th:block>
+							<th:block  th:if="${reply.kakaoProfile == null and reply.userFileRename == null}">
+								<img alt="프로필" src="/img/board/defaultProfile.png" style="width: 55px; height: 55px; border-radius: 50%">
+							</th:block>
+							<img th:if="${reply.kakaoProfile != null}" alt="프로필" th:src="${reply.kakaoProfile}" style="width: 55px; height: 55px; border-radius: 50%">
+						</div>
+						<div style="margin-left: 15px; display: flex; flex-direction: column; justify-content: center">
+							<div th:text="${reply.userName}"></div>
+							<div th:text="${reply.rUpdateDate}"></div>
+						</div>
+					</div>
+					<div style="width: 100%; font-size: 18px;">
+						<input class="replyContent-input" th:id="'reply'+${reply.replyNo}" th:if="${loginUserId == reply.userId}" th:value="${reply.replyContent}" disabled="disabled">
+						<div class="replyContent-div"  th:id="${reply.replyNo}" th:if="${loginUserId != reply.userId}" th:text="${reply.replyContent}"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<footer>
+	        <nav>
+	            <a href="#">이용약관</a> |
+	            <a href="#">개인정보처리방침</a> |
+	            <a href="#">사이트맵</a>
+	        </nav>
+	        <div class="company-info">
+	            <p>상호 : 술길따라 | 대표이사 : 김정욱 | 설립일 : 2024년 8월 26일 | 개인정보관리책임자 : 홍예은</p>
+	            <p>문의 : jwkim@gmail.com | 사업자등록번호 : 111-22-33333 | 서울시 중구 남대문로 120</p>
+	        </div>
+	        <div class="social-icons">
+	            <a href="#" class="icon-facebook"><img src="/img/free-icon-facebook-circular-logo-20673.png" alt=""></a>
+	            <a href="#" class="icon-instagram"><img src="/img/free-icon-instagram-4922972.png" alt=""></a>
+	        </div>
+	        <p class="copyright">Copyright 2024 Sulgilddara Inc. | All Rights Reserved</p>
+	    </footer>
+		
+		
+		
+		<script th:inline="javascript">
+			// 수정 페이지 이동 버튼
+			function showModifyPage(boardNo){
+				location.href="/board/modifyPage/"+boardNo;
+			}
+			// 뒤로가기 버튼
+			function goBack(){
+				history.go(-1);
+			}
+			
+			// 댓글 등록
+			document.querySelector('#replyAddBtn').addEventListener('click', () => {
+				let boardNo = /*[[${board.boardNo}]]*/;
+				let replyAddContent = document.querySelector('#replyAddContent').value;
+				
+				$.ajax({
+					url : "/board/replyAdd",
+					data : {
+						"boardNo" : boardNo,
+						"replyContent" : replyAddContent
+					},
+					type : "POST",
+					success : function(data){ // 서버로부터 return된 값은 직렬화된 json data로 들어옴
+						if(data == "success"){
+							// 리스트 초기화
+							getReplyList();
+							// 댓글작성란 초기화
+							document.querySelector('#replyAddContent').value="";
+						}else if(data == "fail"){
+							addReplyFailAnimation();
+						}
+						
+					},
+					error : function(){
+						console.log("서버 전송 실패");
+					}
+				
+				});
+				
+			});
+			
+			// 내용 없을 시 댓글창 경고
+				function addReplyFailAnimation(){
+					let replyAddContent = document.querySelector('#replyAddContent');
+					
+					if(replyAddContent.value.trim() === ''){
+						replyAddContent.classList.add('fail');
+						setTimeout(()=>{
+							replyAddContent.classList.remove('fail');
+						}, 500);
+					}
+					
+				}	
+			
+			
+			
+			getReplyList();
+			// 댓글 리스트 초기화
+			function getReplyList(){
+				let boardNo = /*[[${board.boardNo}]]*/;
+				$.ajax({
+					url : "/board/replyList",
+					data : {
+						"boardNo" : boardNo
+					},
+					type : "POST",
+					success : function(data){ // 서버로부터 return된 값은 직렬화된 json data로 들어옴
+						console.log('성공?');
+					console.log(data);
+						$('#replyListContainer').replaceWith(data);
+						let totalCount = /*[[${replyTotalCount}]]*/;
+						console.log("성??공??")
+					},
+					error : function(){
+						console.log("서버 전송 실패");
+					}
+				
+				});
+			}
+			
+			
+			// 댓글 삭제
+			function removeReply(replyNo){
+				$.ajax({
+					url : "/board/replyDelete",
+					data : {
+						"replyNo" : replyNo
+					},
+					type : "POST",
+					success : function(data){ // 서버로부터 return된 값은 직렬화된 json data로 들어옴
+						if(data == "success"){
+							console.log("delete sucess");
+							getReplyList();
+						}
+					},
+					error : function(){
+						console.log("서버 전송 실패");
+					}
+				});
+			}
+			
+			// 토글 변수
+			
+			function convertUpdateMode(replyNo){
+				console.log(replyNo);
+				let replyInput = document.querySelector('#reply'+replyNo);
+				// update버튼 토글
+				console.log(replyInput);
+				replyInput.disabled = !replyInput.disabled;
+				if(replyInput.disabled){
+					
+					$.ajax({
+						url : "/board/replyUpdate",
+						data : {
+							"replyNo" : replyNo,
+							"replyContent" : replyInput.value
+						},
+						type : "POST",
+						success : function(data){ // 서버로부터 return된 값은 직렬화된 json data로 들어옴
+							if(data == "success"){
+								console.log("update sucess");
+								getReplyList();
+							}
+						},
+						error : function(){
+							console.log("서버 전송 실패");
+						}
+					});
+				}
+			}
+					
+				
+			// header 이벤트
+			document.addEventListener('DOMContentLoaded', function() {
+				const userMenuToggle = document.getElementById('userMenuToggle');
+				const mypageDropdown = document.getElementById('mypageDropdown');
+				
+				if (userMenuToggle && mypageDropdown) {
+				    userMenuToggle.addEventListener('click', function(e) {
+				        e.preventDefault();
+				        mypageDropdown.classList.toggle('show');
+				    });
+				
+				    // 드롭다운 외부 클릭 시 닫기
+				    window.addEventListener('click', function(e) {
+				        if (!e.target.matches('.icon-user') && !e.target.matches('.header-img')) {
+				            if (mypageDropdown.classList.contains('show')) {
+				                mypageDropdown.classList.remove('show');
+				            }
+				        }
+				    });
+				}
+			});
+			
+		</script>
+	</body>
+</html>

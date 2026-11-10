@@ -1,0 +1,403 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-weight: 0;
+    
+}
+body, html {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 10px;
+    line-height: 1.5;
+}
+ul, ol {
+    list-style: none;
+}
+a {
+    text-decoration: none
+}
+
+/* header */
+header {
+	background-color: white;
+	padding: 20px;
+}
+
+.header-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 90vw;
+	margin: 0 auto;
+	margin-bottom: 25px;
+}
+
+h1 {
+	font-size: 40px;
+	font-weight: 800;
+	margin-top: 8px;
+}
+
+nav ul {
+	list-style-type: none;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
+	gap: 10px;
+}
+
+nav ul li a {
+	text-decoration: none;
+	color: black;
+	font-size: 18px;
+}
+
+.user-actions {
+	display: flex;
+	/* gap: 20px; */
+}
+
+.icon-user, .icon-menu {
+	width: 50px;
+	height: 50px;
+	/* background-color: #D9D9D9; */
+}
+
+.user-actions img {
+	width: 30px;
+	height: 30px;
+}
+body {
+    font-family: 'Noto Serif KR', serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    background-color: #FFFFFF;
+}
+	.container {
+	    max-width: 1200px;
+	    margin: 0 auto;
+	    padding: 20px;
+	    margin-top: 20px;
+	}
+		.brewery-info {
+		    display: flex;
+		    margin-bottom: 30px;
+		}
+			.brewery-image {
+			    width: 400px;
+			    height: 360px;
+			    background-color: #D9D9D9;
+			    margin-right: 30px;
+			    display: flex;
+			    justify-content: center;
+			    align-items: center;
+			    overflow: hidden;
+			}
+				.brewery-image img {
+				    width: 100%;
+				    height: 100%;
+				    object-fit: cover;
+				}
+			.brewery-details {
+			    flex: 1;
+			}
+				.brewery-name {
+				    font-size: 36px;
+				    margin-bottom: 15px;
+				}
+				.brewery-location {
+				    font-size: 18px;
+				    margin-bottom: 10px;
+				}
+				.brewery-local {
+					font-weight: 600;
+				}
+				.tour-badge {
+				    display: inline-block;
+				    background-color: #323240;
+				    border-radius: 15px;
+				    padding: 5px 10px;
+				    font-size: 16px;
+				    margin-left: 10px;
+				    color: white;
+				}
+				.info-list {
+				    font-size: 16px;
+				    line-height: 2.4;
+				}
+	.section-title {
+	    font-size: 24px;
+	    margin: 30px 0 0px;
+	    border-top: 1px solid #000000;
+	    padding-top: 15px;
+	    margin-bottom: 20px;
+	}
+	.products-container {
+	    display: flex;
+	    flex-wrap: wrap;
+	    gap: 20px;
+	    justify-content: flex-start;
+	    padding: 20px;
+	}
+	
+		.product {
+		    flex: 0 0 calc(33.333% - 20px);
+		    max-width: calc(33.333% - 20px);
+		    box-sizing: border-box;
+		    border: 1px solid #ddd;
+		    padding: 10px;
+		    text-align: center;
+		    margin-bottom: 50px;
+		}
+				.product img {
+				    width: 100%;
+				    height: 100%;
+				    object-fit: cover;
+				}
+				.product-info {
+				    margin-top: 10px;
+				}
+				
+					.product-name {
+					    font-weight: bold;
+					    display: block;
+					    margin-bottom: 5px;
+					}
+					
+					.product-details {
+					    font-size: 0.9em;
+					    color: #666;
+					}
+		.programs {
+		    margin-bottom: 30px;
+		}
+			.program {
+/* 			    background-color: #F2EADF; */
+			    padding: 30px;
+			    margin-top: 30px;
+			    margin-bottom: 15px;
+			    position: relative;
+			    border-radius: 20px;
+			    border: 1px solid #ddd;
+			}
+				.program-name {
+				    font-size: 20px;
+				    margin-bottom: 10px;
+				}
+				.program-info {
+				    font-size: 16px;
+				}
+				.program-details {
+				    display: flex;
+				    justify-content: space-between;
+				    align-items: center;
+				    margin-top: 10px;
+				}
+					.book-button {
+					    background-color: #FFFFFF;
+					    border: 1px solid #000000;
+					    padding: 5px 10px;
+					    font-size: 14px;
+					    cursor: pointer;
+					}
+		#map {
+		    width: 100%;
+		    height: 400px;
+		    background-color: #D9D9D9;
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    font-size: 24px;
+		    margin-bottom: 30px;
+		}
+			#address {
+				margin-top: 10px;
+				margin-bottom: 20px;
+			}
+		.amenities {
+		    display: flex;
+/* 		    justify-content: space-between; */
+		    flex-wrap: wrap;
+/* 		    width: 100px; */
+/* 			height: 100px; */
+/* 			background-color: #D9D9D9; */
+/* 			justify-content: center; */
+		    align-items: center;
+		    margin-bottom: 15px;
+/* 		    float: left; */
+		}
+			.amenity {
+				display: flex;
+				border: 1px solid #ddd;
+			    justify-content: center;
+			    align-items: center;
+			    flex-direction: column;
+			    overflow: hidden;
+			    margin-bottom: 15px;
+				width: 115px;
+				height: 115px;
+				border-radius: 10px;
+				margin-right: 20px;
+				padding: 10px;
+			}
+				.amenity img {
+					display: flex;
+					text-align: center;
+				    width: 50px;
+				    height: 50px;
+				    float: left;
+				    
+				}
+				.fac-name {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					width: 100%;
+					height: 20%;
+					float: left;
+					align-items: center;
+					font-family:Georgia, 'Times New Roman', Times, serif;
+					margin-top: 10px;
+					font-size: 14px;
+				}
+/* footer */
+footer {
+	background-color: white;
+	padding: 50px 20px;
+	text-align: center;
+}
+
+footer nav {
+	margin-bottom: 20px;
+}
+
+footer nav a {
+	text-decoration: none;
+	color: black;
+	font-size: 15px;
+}
+
+.company-info {
+	font-size: 13px;
+	line-height: 1.5;
+	margin-bottom: 20px;
+}
+
+.social-icons {
+	display: flex;
+	justify-content: center;
+	gap: 20px;
+	margin-bottom: 20px;
+}
+
+.icon-facebook, .icon-instagram {
+	width: 40px;
+	height: 40px;
+}
+
+.social-icons img {
+	width: 100%;
+}
+
+.copyright {
+	font-size: 10px;
+}
+
+
+#logo {
+	width: 80px;
+	height: 80px;
+}
+#logo {
+	/* width: 100px;
+    height: 100px; */
+	border-radius: 25%;
+	margin: auto 10px;
+	/* margin-right: 10px; */
+}
+
+#logo-container {
+	display: flex;
+	flex-direction: row;
+}
+.logo-link {
+	text-decoration: none; /* 링크의 밑줄 제거 */
+	color: inherit; /* 링크의 색상 제거 */
+}
+		/* 네비게이션 바 추가 - 여기서부터 추가*/
+.dropdown {
+	position: relative;
+	display: inline-block;
+}
+
+.icon-user {
+	cursor: pointer;
+}
+
+.header-img {
+	width: 30px;
+	height: 30px;
+}
+
+.mypage-content {
+	display: none;
+	position: absolute;
+	background-color: #f9f9f9;
+	min-width: 120px;
+	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+	z-index: 2;
+	right: 0;
+	font-size: 13px;
+	font-weight: 400;
+	--text-align: center;
+}
+
+.mypage-content a {
+	color: black;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
+}
+
+.mypage-content a:hover {
+	background-color: #f1f1f1;
+}
+
+.show {
+	display: block;
+}
+
+.user-name {
+	padding: 12px 16px;
+	display: block;
+}
+
+.logo-link {
+	text-decoration: none; /* 링크의 밑줄 제거 */
+	color: inherit; /* 링크의 색상 제거 */
+}
+	.header-img {
+		margin: 10px 20px;
+		flex: 1;
+		min-width: 0;
+	}
+	.user-actions {
+		display: flex;
+		gap: 20px;
+	}
+	.icon-user {
+		display: inline-block;
+		width: 50px;
+		height: 50px;
+	}
+	.user-actions img {
+		width: 50px;
+		height: 50px;
+	}
+	h1 {
+		font-size: 40px;
+		font-weight: 800;
+	}
+		

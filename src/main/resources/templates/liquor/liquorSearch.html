@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>술길따라</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/liquor/liquorSearch.css">
+    <!-- 태그 라이브러리 다운-->
+		<!-- 소스 다운 -->
+		<script src="https://unpkg.com/@yaireo/tagify"></script>
+		<!-- 폴리필 (구버젼 브라우저 지원) -->
+		<script src="https://unpkg.com/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
+		<link href="https://unpkg.com/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <div class="container">
+        <header>
+	        <div class="header-top">
+	            <div style="width: 100px;;"></div>
+	            	<a href="/" class="logo-link">
+		            <div id="logo-container">
+		                <img src="/img/logo.png" alt="" id="logo">
+			            <h1>술길따라</h1>
+		            </div>
+	            	</a>
+	            <div class="user-actions">
+		            <div class="dropdown" th:if="${session.userId != null}">
+	        			<a href="#" class="icon-user" id="userMenuToggle">
+	            			<img class="header-img" src="/img/free-icon-user-17095347.png" alt="사용자 아이콘">
+	        			</a>
+	        			<div class="mypage-content" id="mypageDropdown">
+	        				<span class="user-name" th:text="${session.userName} + '님'"></span>
+	        					<hr>
+	            			<a href="/user/update">마이페이지</a>
+	            			<a href="/user/logout">로그아웃</a>
+	            			<a href="/reservation/search">예약조회</a>
+	        			</div>
+	    			</div>
+	    			<div th:if="${session.userId == null}">
+	    				<a href="/user/login" class="icon-user">
+		                	<img class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+		                </a>
+		            </div>
+	               	<a href="#" class="icon-menu">
+	                	<img class="header-img" src="/img/free-icon-menu-3856832.png" alt="">
+	                </a>
+	            </div>
+	        	</div>
+	        <nav>
+	            <ul>
+	                <li><a href="/#story">술길따라 이야기</a></li>
+	                <li><a href="/brewery/">양조장 탐방</a></li>
+	                <li><a href="/liquor/search">술 도감</a></li>
+	                <li><a href="/reservation/list">투어 예약</a></li>
+	                <li><a href="/board/listCard">술 이야기</a></li>
+	            </ul>
+	        </nav>
+	    </header>
+        
+        <div class="content-wrapper">
+            <main class="main-content">
+                
+				<div class="liquor-grid">
+				    <!-- Thymeleaf로 반복 처리 -->
+				    <div th:each="liquor, iterStat : ${liquorList}" class="liquor-item" th:onclick="'window.location.href=\'' + @{/liquor/detail/{id}(id=${liquor.liquorId})} + '\''">
+						<div class="liquor-image" th:style="${'background-image: url(' + (#lists.isEmpty(imgList[iterStat.index]) ? 
+																							'/img/liquor/empty_bottle.png' : 
+																							(imgList[iterStat.index][0].filePath + imgList[iterStat.index][0].fileRename)) + 
+																							'); background-size: cover; background-position: center;'}">
+						</div>
+				        <div class="liquor-info">
+				            <div class="rating" th:text="${liquor.avgPoint}">5.0</div>
+				            <h3 th:text="${liquor.liquorName}">술이름</h3>
+				            <div class="type" th:text="${liquor.liquorType}">주종</div>
+							<ul class="tagList tag-container">
+								<li th:each="tag : ${tagList[iterStat.index]}" th:text="${tag.tagName}+'('+${tag.tagCount}+')'" class="tag-item"></li>
+			                </ul>	
+				            <div class="stats">
+				                <span class="reviews" th:text="'★리뷰수 : '+${liquor.reviewCount}">★리뷰수</span>
+				            </div>
+				        </div>
+				    </div>
+				</div>
+				
+				<nav>
+			        <ul class="pagination" th:with="startNumber=${pn.startNavi}, endNumber=${pn.endNavi}">
+			            <li th:class="${cp <= 1} ? 'disabled' : ''">
+			            	<a th:if="${cp > 1}" th:href="@{/liquor/search(cp=1, 
+						        liquorType=${sInfo.liquorType},
+						        breweryLocal=${sInfo.breweryLocal},
+						        alcholMin=${sInfo.alcholMin},
+						        alcholMax=${sInfo.alcholMax},
+						        capacityMin=${sInfo.capacityMin},
+						        capacityMax=${sInfo.capacityMax},
+						        priceMin=${sInfo.priceMin},
+						        priceMax=${sInfo.priceMax},
+						        tags=${tags})}" class="arrow">&laquo;&laquo;</a>
+			                <span th:unless="${cp > 1}" class="arrow disabled">&laquo;&laquo;</span>
+			            </li>
+			            <li th:class="${cp <= 1} ? 'disabled' : ''">
+			                <a th:if="${cp > 1}" th:href="@{/liquor/search(cp=${cp - 1}, 
+						        liquorType=${sInfo.liquorType},
+						        breweryLocal=${sInfo.breweryLocal},
+						        alcholMin=${sInfo.alcholMin},
+						        alcholMax=${sInfo.alcholMax},
+						        capacityMin=${sInfo.capacityMin},
+						        capacityMax=${sInfo.capacityMax},
+						        priceMin=${sInfo.priceMin},
+						        priceMax=${sInfo.priceMax},
+						        tags=${tags})}" class="arrow">&laquo;</a>
+			                <span th:unless="${cp > 1}" class="arrow disabled">&laquo;</span>
+			            </li>
+			            
+			            <li th:each="pageNumber : ${#numbers.sequence(startNumber, endNumber)}" 
+			                th:class="${pageNumber == cp} ? 'active' : ''">
+			                <a th:href="@{/liquor/search(cp=${pageNumber}, 
+					            liquorType=${sInfo.liquorType},
+					            breweryLocal=${sInfo.breweryLocal},
+					            alcholMin=${sInfo.alcholMin},
+					            alcholMax=${sInfo.alcholMax},
+					            capacityMin=${sInfo.capacityMin},
+					            capacityMax=${sInfo.capacityMax},
+					            priceMin=${sInfo.priceMin},
+					            priceMax=${sInfo.priceMax},
+					            tags=${tags})}" 
+					           th:text="${pageNumber}"
+					           th:class="${pageNumber == cp} ? 'active' : ''"></a>
+			            </li>
+			            
+			            <li th:class="${cp >= pn.endNavi} ? 'disabled' : ''">
+			            	<a th:if="${cp < pn.endNavi}" th:href="@{/liquor/search(cp=${cp + 1}, 
+						        liquorType=${sInfo.liquorType},
+						        breweryLocal=${sInfo.breweryLocal},
+						        alcholMin=${sInfo.alcholMin},
+						        alcholMax=${sInfo.alcholMax},
+						        capacityMin=${sInfo.capacityMin},
+						        capacityMax=${sInfo.capacityMax},
+						        priceMin=${sInfo.priceMin},
+						        priceMax=${sInfo.priceMax},
+						        tags=${tags})}" class="arrow">&raquo;</a>
+			                <span th:unless="${cp < pn.endNavi}" class="arrow disabled">&raquo;</span>
+			            </li>
+			            <li th:class="${cp >= pn.endNavi} ? 'disabled' : ''">
+			            	<a th:if="${cp < pn.endNavi}" th:href="@{/liquor/search(cp=${pn.endNavi}, 
+						        liquorType=${sInfo.liquorType},
+						        breweryLocal=${sInfo.breweryLocal},
+						        alcholMin=${sInfo.alcholMin},
+						        alcholMax=${sInfo.alcholMax},
+						        capacityMin=${sInfo.capacityMin},
+						        capacityMax=${sInfo.capacityMax},
+						        priceMin=${sInfo.priceMin},
+						        priceMax=${sInfo.priceMax},
+						        tags=${tags})}" class="arrow">&raquo;&raquo;</a>
+			                <span th:unless="${cp < pn.endNavi}" class="arrow disabled">&raquo;&raquo;</span>
+			            </li>
+			        </ul>
+			    </nav>
+
+            </main>
+            
+            <aside class="sidebar">
+                <form action="/liquor/search" method="post">
+                    <div class="search-bar">
+                        <input type="text" name="keyword" th:value="${sInfo.keyword == null ? '' : sInfo.keyword}" placeholder="검색">
+                        <button>검색</button>
+                    </div>
+                    <div class="filter-section">
+                        <h4>주종</h4>
+                        <select name="liquorType" th:value="${sInfo.liquorType}">
+                            <option value="all" th:selected="${sInfo.liquorType == 'all'}")>전체</option>
+                            <option value="전통주" th:selected="${sInfo.liquorType == '전통주'}">전통주</option>
+                            <option value="막걸리" th:selected="${sInfo.liquorType == '막걸리'}">막걸리</option>
+                            <option value="청주" th:selected="${sInfo.liquorType == '청주'}">청주</option>
+                            <option value="소주" th:selected="${sInfo.liquorType == '소주'}">소주</option>
+                            <option value="와인" th:selected="${sInfo.liquorType == '와인'}">와인</option>
+                            <option value="위스키" th:selected="${sInfo.liquorType == '위스키'}">위스키</option>
+                            <option value="맥주" th:selected="${sInfo.liquorType == '맥주'}">맥주</option>
+                            <option value="리큐르" th:selected="${sInfo.liquorType == '리큐르'}">리큐르</option>
+                            <option value="브랜디" th:selected="${sInfo.liquorType == '브랜디'}">브랜디</option>
+							<option value="보드카" th:selected="${sInfo.liquorType == '보드카'}">보드카</option>
+                        </select>
+                        <h4>생산지</h4>
+                        <select id="local" name="breweryLocal" th:value="${sInfo.breweryLocal}">
+                            <option value="all" th:selected="${sInfo.breweryLocal == 'all'}">전체</option>
+                            <option value="sudo" th:selected="${sInfo.breweryLocal == 'sudo'}">수도권</option>
+                            <option value="gang" th:selected="${sInfo.breweryLocal == 'gang'}">강원</option>
+                            <option value="chung" th:selected="${sInfo.breweryLocal == 'chung'}">충청</option>
+                            <option value="gyeong" th:selected="${sInfo.breweryLocal == 'gyeong'}">경상</option>
+                            <option value="jeoll" th:selected="${sInfo.breweryLocal == 'jeoll'}">전라</option>
+                            <option value="jeju" th:selected="${sInfo.breweryLocal == 'jeju'}">제주</option>
+                        </select>
+                        <h4>도수</h4>
+                        <input type="number" step="0.01" name="alcholMin" th:value="${sInfo.alcholMin}" placeholder="최소">&nbsp;~&nbsp;
+                        <input type="number" step="0.01" name="alcholMax" th:value="${sInfo.alcholMax}" placeholder="최대">
+                        <h4>용량</h4>
+                        <input type="number" step="0.01" name="capacityMin" th:value="${sInfo.capacityMin}" placeholder="최소">&nbsp;~&nbsp;
+                        <input type="number" step="0.01" name="capacityMax" th:value="${sInfo.capacityMax}" placeholder="최대">
+                        <h4>가격대</h4>
+                        <input type="number" step="0.01" name="priceMin" th:value="${sInfo.priceMin}" placeholder="최소">&nbsp;~&nbsp;
+                        <input type="number" step="0.01" name="priceMax" th:value="${sInfo.priceMax}" placeholder="최대">
+
+                        <h4>태그</h4>
+                        <input type="text" id="tags" name="tags" placeholder="태그는 ,로 구분" th:value="${tags}"> <br><br>
+                        <button type="button" class="ai-search" th:onclick="'window.location.href=\'' + @{/liquor/ai-search} + '\''">AI 검색</button>
+
+                        <script>
+                        
+                            /////////////////////////////////////// 태그 js
+                            const input = document.querySelector('input[name=tags]');
+                            let tagify = new Tagify(input); // Tagify 초기화
+                            
+                            // 태그가 추가되면 이벤트 발생
+                            tagify.on('add', function() {
+                            console.log(tagify.value); // 입력된 태그 정보 객체(배열)
+                            console.log(tagify.value[0].value) // 태그 배열 0번째 객체의 value값 -> 입력한 태그
+                            })
+                        </script>
+
+                    </div>
+                </form>
+            </aside>
+        </div>
+        
+        <footer>
+	        <nav>
+	            <a href="#">이용약관</a> |
+	            <a href="#">개인정보처리방침</a> |
+	            <a href="#">사이트맵</a>
+	        </nav>
+	        <div class="company-info">
+	            <p>상호 : 술길따라 | 대표이사 : 김정욱 | 설립일 : 2024년 8월 26일 | 개인정보관리책임자 : 홍예은</p>
+	            <p>문의 : jwkim@gmail.com | 사업자등록번호 : 111-22-33333 | 서울시 중구 남대문로 120</p>
+	        </div>
+	        <div class="social-icons">
+	            <a href="#" class="icon-facebook"><img src="/img/free-icon-facebook-circular-logo-20673.png" alt=""></a>
+	            <a href="#" class="icon-instagram"><img src="/img/free-icon-instagram-4922972.png" alt=""></a>
+	        </div>
+	        <p class="copyright">Copyright 2024 Sulgilddara Inc. | All Rights Reserved</p>
+	    </footer>
+    </div>
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const userMenuToggle = document.getElementById('userMenuToggle');
+			const mypageDropdown = document.getElementById('mypageDropdown');
+			
+			if (userMenuToggle && mypageDropdown) {
+			    userMenuToggle.addEventListener('click', function(e) {
+			        e.preventDefault();
+			        mypageDropdown.classList.toggle('show');
+			    });
+			
+			    // 드롭다운 외부 클릭 시 닫기
+			    window.addEventListener('click', function(e) {
+			        if (!e.target.matches('.icon-user') && !e.target.matches('.header-img')) {
+			            if (mypageDropdown.classList.contains('show')) {
+			                mypageDropdown.classList.remove('show');
+			            }
+			        }
+			    });
+			}
+		});
+	
+	</script>
+</body>
+</html>

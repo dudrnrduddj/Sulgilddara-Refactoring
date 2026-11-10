@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.makjan.sulgilddara.brewery.model.mapper.BreweryMapper">
+	  <insert id="insertBrewery">
+	  	<selectKey order="BEFORE" resultType="_int" keyProperty="breweryNo">
+	  		SELECT SEQ_BREWERY_NO.NEXTVAL FROM DUAL
+	  	</selectKey>
+	  		INSERT INTO BREWERY_TBL
+	  		VALUES(#{breweryNo}, 
+	  				#{breweryName}, 
+	  				#{breweryLocal}, 
+	  				#{breweryAddr}, 
+	  				#{breweryPhone}, 
+	  				#{breweryUrl}, 
+	  				DEFAULT, 
+	  				DEFAULT, 
+	  				#{openTime}, 
+	  				#{closeTime}, 
+	  				#{fileName}, 
+	  				#{fileRename}, 
+	  				#{filePath},
+	  				#{facilities},
+	  				#{kidsZone},
+	  				#{disFriendly})
+	  </insert>
+	  <select id="selectAllList" resultType="Brewery">
+	  		SELECT * FROM BREWERY_TBL
+	  		ORDER BY BREWERY_NO ASC
+	  </select>
+	  <select id="searchOneByNo" resultType="Brewery">
+	  		SELECT * FROM BREWERY_TBL WHERE BREWERY_NO=#{breweryNo}
+	  </select>
+	  <update id="updateBrewery">
+	  		UPDATE BREWERY_TBL
+	  		SET BREWERY_NAME=#{breweryName}, 
+	  		BREWERY_LOCAL=#{breweryLocal}, 
+	  		BREWERY_ADDR=#{breweryAddr}, 
+	  		BREWERY_PHONE=#{breweryPhone}, 
+	  		OPENTIME=#{openTime}, 
+	  		CLOSETIME=#{closeTime}, 
+	  		BREWERY_URL=#{breweryUrl},
+	  		B_UPDATE_DATE=DEFAULT,
+	  		FILENAME=#{fileName},
+	  		FILERENAME=#{fileRename},
+	  		FILEPATH=#{filePath},
+	  		FACILITIES=#{facilities},
+	  		KIDSZONE=#{kidsZone},
+	  		DISFRIENDLY=#{disFriendly}
+	  		WHERE BREWERY_NO=#{breweryNo}
+	  </update>
+	  <delete id="deleteBrewery">
+	  		DELETE FROM BREWERY_TBL
+	  		WHERE BREWERY_NO=#{breweryNo}
+	  </delete>
+	  <select id="selectSearchList" resultType="Brewery">
+	  	SELECT * FROM BREWERY_TBL
+		<where>
+			<if test="searchCondition == 'all' and searchKeyword != ''">
+				BREWERY_NAME LIKE '%'||#{searchKeyword}||'%' 
+				OR BREWERY_LOCAL LIKE '%'||#{searchKeyword}||'%'
+			</if>
+	<!-- 	양조장명으로 검색하는 쿼리문 -->
+			<if test="searchCondition == 'brewery' and searchKeyword != ''">
+				BREWERY_NAME LIKE '%'||#{searchKeyword}||'%'
+			</if>
+	<!-- 	지역명으로 검색하는 쿼리문 -->
+			<if test="searchCondition == 'local' and searchKeyword != ''">
+				BREWERY_LOCAL LIKE '%'||#{searchKeyword}||'%'
+			</if>
+		</where>
+		ORDER BY BREWERY_NO ASC
+	  </select>
+	  <insert id="insertTag">
+		  <selectKey order="BEFORE" resultType="_int" keyProperty="breweryTagNo">
+		  		SELECT SEQ_TAG_NO.NEXTVAL FROM DUAL
+		  </selectKey>
+	  	INSERT INTO BREWERY_TAG_TBL
+	  	VALUES(#{breweryTagNo}, #{breweryTagName}, #{breweryNo})
+	  </insert>
+	  <select id="showTagByBrwNo" resultType="BreweryTag">
+<!-- 	  	SELECT * FROM BREWERY_TAG_TBL -->
+<!-- 	  	WHERE BREWERY_NO=#{breweryNo} -->
+<!-- 	  	ORDER BY BREWERY_TAG_NO ASC -->
+<!-- 	  	#전국 빼기위해 로우넘버 사용 -->
+        SELECT * FROM (
+            SELECT BREWERY_TAG_NAME,
+                   ROW_NUMBER() OVER (ORDER BY BREWERY_TAG_NO ASC) AS RN
+            FROM BREWERY_TAG_TBL
+            WHERE BREWERY_NO = #{breweryNo}
+        )
+        WHERE RN > 1
+	  </select>
+	  <select id="showAllTagByBrwNo" resultType="BreweryTag">
+        SELECT BREWERY_TAG_NAME
+        FROM BREWERY_TAG_TBL
+        WHERE BREWERY_NO = #{breweryNo}
+        ORDER BY BREWERY_TAG_NO
+	  </select>
+	  <delete id="deleteTag">
+	  	DELETE FROM BREWERY_TAG_TBL
+	  	WHERE BREWERY_NO=#{breweryNo}
+	  </delete>
+	  <select id="getTotalCount" resultType="_int">
+		SELECT COUNT(*) FROM BREWERY_TBL
+		<where>
+			<if test="searchCondition == 'all' and searchKeyword != ''">
+				BREWERY_NAME LIKE '%'||#{searchKeyword}||'%' 
+				OR BREWERY_LOCAL LIKE '%'||#{searchKeyword}||'%'
+			</if>
+	<!-- 	양조장명으로 검색하는 쿼리문 -->
+			<if test="searchCondition == 'brewery' and searchKeyword != ''">
+				BREWERY_NAME LIKE '%'||#{searchKeyword}||'%'
+			</if>
+	<!-- 	지역명으로 검색하는 쿼리문 -->
+			<if test="searchCondition == 'local' and searchKeyword != ''">
+				BREWERY_LOCAL LIKE '%'||#{searchKeyword}||'%'
+			</if>
+		</where>
+	  </select>
+	  <select id="selectLocalList" resultType="Brewery">
+	  	<![CDATA[
+	        SELECT * FROM 
+	        (SELECT * FROM BREWERY_TBL 
+	       	WHERE BREWERY_LOCAL=#{breweryLocal}
+	        ORDER BY BREWERY_NO ASC)
+	        WHERE ROWNUM <= 3
+	    ]]>
+	  </select>
+	  <select id="selectThreeBrewery" resultType="Brewery">
+	    <![CDATA[
+	        SELECT * FROM 
+	        (SELECT * FROM BREWERY_TBL ORDER BY BREWERY_NO ASC)
+	        WHERE ROWNUM <= 3
+	    ]]>
+	  </select>
+	  <select id="selectAllTag" resultType="BreweryTag">
+	  	SELECT DISTINCT BREWERY_TAG_NAME FROM BREWERY_TAG_TBL
+	  </select>
+<!-- 	  메인에서 전체보기 눌렀을 때 지역값 받아서 리스트 가기 위한 쿼리 -->	  
+	  <select id="selectTagList" resultType="Brewery">
+	  	<![CDATA[
+		  	SELECT * FROM BREWERY_TBL
+		  	JOIN BREWERY_TAG_TBL USING (BREWERY_NO)
+		  	WHERE BREWERY_TAG_NAME=#{tagName}
+	    ]]>
+	  </select>
+<!-- 	  메인에서 랜덤 해시태그 별 양조장 네개만 출력하기 위한 쿼리 -->
+	  <select id="selectFourTagList" resultType="Brewery">
+	  	<![CDATA[
+		  	SELECT * FROM BREWERY_TBL
+		  	JOIN BREWERY_TAG_TBL USING (BREWERY_NO)
+		  	WHERE BREWERY_TAG_NAME=#{tagName}
+  		  	AND ROWNUM <= 4
+	    ]]>
+	  </select>
+	 <select id="searchLiquorByNo" resultType="Liquor">
+		SELECT l.*,
+		       CASE 
+		         WHEN ROW_NUMBER() OVER (PARTITION BY l.LIQUOR_TYPE ORDER BY l.LIQUOR_ID) = 1 
+		         THEN l.LIQUOR_TYPE 
+		         ELSE NULL 
+		       END AS UNIQUE_LIQUOR_TYPE
+		FROM LIQUOR_TBL l
+		WHERE l.BREWERY_ID = #{breweryNo}
+		ORDER BY l.LIQUOR_TYPE, l.LIQUOR_ID
+	 </select>
+	 <select id="searchLiquorImageByNo" resultType="LiquorImage">
+		SELECT *
+        FROM LIQUOR_IMAGE_TBL li
+        JOIN LIQUOR_TBL l ON li.LIQUOR_ID = l.LIQUOR_ID
+        WHERE l.BREWERY_ID = #{breweryNo}
+	 </select>
+	 <select id="selectRandomTag" resultType="BreweryTag">
+		<![CDATA[
+			SELECT DISTINCT BREWERY_TAG_NAME
+			FROM (
+			    SELECT BREWERY_TAG_NAME
+			    FROM BREWERY_TAG_TBL
+			    ORDER BY DBMS_RANDOM.VALUE
+			)
+			WHERE ROWNUM <= 3
+        ]]>
+    </select>
+  </mapper>

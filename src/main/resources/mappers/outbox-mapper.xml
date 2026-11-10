@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+	<mapper namespace="com.makjan.sulgilddara.board.model.mapper.OutboxMapper">
+	    
+	    <insert id="insertEvent">
+	        INSERT INTO OUTBOX_TBL (
+	            EVENT_ID,
+	            AGGREGATE_ID,
+	            EVENT_TYPE,
+	            STATUS,
+	            RETRY_COUNT,
+	            CREATED_AT
+	        )
+	        VALUES (
+	            SEQ_OUTBOX_EVENT_NO.NEXTVAL,
+	            #{aggregateId},
+	            #{eventType},
+	            'PENDING',
+	            0,
+	            SYSTIMESTAMP
+	        )
+	    </insert>
+	    
+	    <!-- 미처리 이벤트 조회 -->
+		<select id="selectPendingEvents"
+		        resultType="OutboxEvent">
+		    SELECT *
+		    FROM (
+		        SELECT O.EVENT_ID,
+			           O.AGGREGATE_ID,
+			           O.EVENT_TYPE,
+			           O.STATUS,
+			           O.RETRY_COUNT,
+			           O.CREATED_AT,
+			           O.PROCESSING_AT
+			    FROM OUTBOX_TBL O
+			    WHERE O.STATUS = 'PENDING'
+			    ORDER BY O.EVENT_ID
+		    )
+		    WHERE ROWNUM &lt;= #{limit}
+		</select>
+		
+		<!-- 이벤트 선점 -->
+		<update id="claimEvent">
+		    UPDATE OUTBOX_TBL
+		    SET STATUS = 'PROCESSING',
+		        PROCESSING_AT = SYSTIMESTAMP
+		
+		    WHERE EVENT_ID = #{eventId}
+		      AND STATUS = 'PENDING'
+		
+		      AND NOT EXISTS (
+		          SELECT 1
+		          FROM OUTBOX_TBL OTHER
+		          WHERE OTHER.AGGREGATE_ID = (
+		              SELECT TARGET.AGGREGATE_ID
+		              FROM OUTBOX_TBL TARGET
+		              WHERE TARGET.EVENT_ID = #{eventId}
+		          )
+		            AND OTHER.EVENT_ID &lt;&gt; #{eventId}
+		            AND OTHER.STATUS = 'PROCESSING'
+		      )
+		</update>
+		
+		<!-- 오래된 PROCESSING 이벤트 복구 -->
+		<update id="resetStaleProcessingEvents">
+		    UPDATE OUTBOX_TBL
+		    SET STATUS = 'PENDING',
+		        PROCESSING_AT = NULL
+		    WHERE STATUS = 'PROCESSING'
+		      AND PROCESSING_AT &lt;
+		          SYSTIMESTAMP - NUMTODSINTERVAL(15, 'MINUTE')
+		</update>
+		
+		<!-- 처리 완료 -->
+		<update id="completeEvent">
+		    UPDATE OUTBOX_TBL
+		    SET STATUS = 'COMPLETED',
+		        PROCESSED_AT = SYSTIMESTAMP,
+		        PROCESSING_AT = NULL,
+		        ERROR_MESSAGE = NULL
+		    WHERE EVENT_ID = #{eventId}
+		      AND STATUS = 'PROCESSING'
+		</update>
+		
+		<!-- 처리 실패 -->
+		<update id="failEvent">
+		    UPDATE OUTBOX_TBL
+		    SET STATUS =
+		        CASE
+		            WHEN RETRY_COUNT + 1 >= #{maxRetries}
+		            THEN 'FAILED'
+		            ELSE 'PENDING'
+		        END,
+		        RETRY_COUNT = RETRY_COUNT + 1,
+		        ERROR_MESSAGE = #{errorMessage},
+		        PROCESSING_AT = NULL
+		    WHERE EVENT_ID = #{eventId}
+		      AND STATUS = 'PROCESSING'
+		</update>
+	</mapper>

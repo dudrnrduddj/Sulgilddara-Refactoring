@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>양조장 메인페이지</title>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/brewery/breweryMain.css">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    </head>
+    <body>
+        <header>
+		<div class="header-top">
+			<div style="width: 100px;;"></div>
+	            <a href="/" class="logo-link">
+					<div id="logo-container">
+						<img src="../../img/logo.png" alt="" id="logo">
+						<h1>술길따라</h1>
+					</div>
+				</a>
+			<div class="user-actions">
+		            <div class="dropdown" th:if="${session.userId != null}">
+	        			<a href="#" class="icon-user" id="userMenuToggle">
+	            			<img class="header-img" src="/img/free-icon-user-17095347.png" alt="사용자 아이콘">
+	        			</a>
+	        			<div class="mypage-content" id="mypageDropdown">
+	        				<span class="user-name" th:text="${session.userName} + '님'"></span>
+	        					<hr>
+	            			<a href="/user/update">마이페이지</a>
+	            			<a href="/user/logout">로그아웃</a>
+	            			<a href="/reservation/search">예약조회</a>
+	        			</div>
+	    			</div>
+	    			<div th:if="${session.userId == null}">
+	    				<a href="/user/login" class="icon-user">
+		                	<img class="header-img" src="/img/free-icon-user-17095347.png" alt="">
+		                </a>
+		            </div>
+	               	<a href="#" class="icon-menu">
+	                	<img class="header-img" src="/img/free-icon-menu-3856832.png" alt="">
+	                </a>	                
+	    		</div>
+			</div>
+	        <nav>
+	            <ul>
+	               	<li><a href="/#story">술길따라 이야기</a></li>
+	                <li><a href="/brewery/">양조장 탐방</a></li>
+	                <li><a href="/liquor/search">술 도감</a></li>
+	                <li><a href="/reservation/list">투어 예약</a></li>
+	                <li><a href="/board/listCard">술 이야기</a></li>
+	            </ul>
+	        </nav>
+	    </header>
+        <main>
+            <div class="top">
+                <div class="map-inner">
+                    <div class="mapLink">
+                        <a class="area sudo" id="001" style="cursor: pointer;" onclick="getBreweryList('sudo');"></a>
+                        <a class="area gang" id="002" style="cursor: pointer;" onclick="getBreweryList('gang');"></a>
+                        <a class="area chung" id="003" style="cursor: pointer;" onclick="getBreweryList('chung');"></a>
+                        <a class="area jeoll" id="004" style="cursor: pointer;" onclick="getBreweryList('jeoll');"></a>
+                        <a class="area gyeong" id="005" style="cursor: pointer;" onclick="getBreweryList('gyeong');"></a>
+                        <a class="area jeju" id="006" style="cursor: pointer;" onclick="getBreweryList('jeju');"></a>
+                    </div>
+                    <div class="mapImg">
+                        <img src="../img/map_all.jpg" class="all">
+                        <img src="../img/map_sudo.jpg" class="sudo">
+                        <img src="../img/map_gang.jpg" class="gang">
+                        <img src="../img/map_chung.jpg" class="chung">
+                        <img src="../img/map_jeoll.jpg" class="jeoll">
+                        <img src="../img/map_gyeong.jpg" class="gyeong">
+                        <img src="../img/map_jeju.jpg" class="jeju">
+                    </div>
+                	<button id="all-btn" onclick="getBreweryList('all')">전국</button>
+                </div>
+				<div id="mapTag" class="mapTag">
+					<p id="selected-local"></p>
+				</div>
+				<ul id="detail-list">
+					<li id="selected-list">
+						<div id="list-box"></div>
+					</li>
+				</ul>
+            </div>
+			<div class="bottom">
+				<h2 class="section-title">추천 양조장</h2>
+				<div class="rec-box">
+					<span class="random-tag" 
+					      th:each="tag : ${tList}" 
+					      th:text="${tag.breweryTagName}" 
+					      th:data-brewery-tag="${tag.breweryTagName}">
+					</span>				
+			  		<div id="brewery-list">
+			    		<div class="brewery-item" th:each="brewery : ${bList}">
+							<div class="brewery-image" 
+								th:onclick="'goToBreweryDetail(' + ${brewery.breweryNo} + ');'" 
+								th:style="|background-image: url('${brewery.filePath}/${brewery.fileRename}');|">
+							</div>
+						    <div class="brewery-info">    
+						        <h3 th:text="${brewery.breweryName}" th:onclick="'goToBreweryDetail(' + ${brewery.breweryNo} + ');'"></h3>
+						        <p class="breweryAddr" th:text="${brewery.breweryAddr}"></p>
+						    </div>
+						</div>
+			 		</div>
+				 </div>
+			</div>
+        </main>
+        
+        <footer>
+	        <nav>
+	            <a href="#">이용약관</a> |
+	            <a href="#">개인정보처리방침</a> |
+	            <a href="#">사이트맵</a>
+	        </nav>
+	        <div class="company-info">
+	            <p>상호 : 술길따라 | 대표이사 : 김정욱 | 설립일 : 2024년 8월 26일 | 개인정보관리책임자 : 홍예은</p>
+	            <p>문의 : jwkim@gmail.com | 사업자등록번호 : 111-22-33333 | 서울시 중구 남대문로 120</p>
+	        </div>
+	        <div class="social-icons">
+	            <a href="#" class="icon-facebook"><img src="../../img/free-icon-facebook-circular-logo-20673.png" alt=""></a>
+	            <a href="#" class="icon-instagram"><img src="../../img/free-icon-instagram-4922972.png" alt=""></a>
+	        </div>
+	        <p class="copyright">Copyright 2024 Sulgilddara Inc. | All Rights Reserved</p>
+	    </footer>
+    </body>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('.mapImg .all').style.display = 'block';
+        getBreweryList('all');
+        
+        
+        document.querySelectorAll('.random-tag').forEach(function(element) {
+            element.addEventListener('click', function() {
+                document.querySelectorAll('.random-tag').forEach(function(el) {
+                    el.classList.remove('selected');
+                });
+
+                this.classList.add('selected');
+
+                var tagName = this.getAttribute('data-brewery-tag');
+                showList(tagName);
+            });
+        });
+        var firstTag = document.querySelector('.random-tag');
+        if (firstTag) {
+            firstTag.classList.add('selected');
+            var firstTagName = firstTag.getAttribute('data-brewery-tag');
+            showList(firstTagName);
+        }
+        const userMenuToggle = document.getElementById('userMenuToggle');
+		const mypageDropdown = document.getElementById('mypageDropdown');
+		
+		if (userMenuToggle && mypageDropdown) {
+		    userMenuToggle.addEventListener('click', function(e) {
+		        e.preventDefault();
+		        mypageDropdown.classList.toggle('show');
+		    });
+		
+		    // 드롭다운 외부 클릭 시 닫기
+		    window.addEventListener('click', function(e) {
+		        if (!e.target.matches('.icon-user') && !e.target.matches('.header-img')) {
+		            if (mypageDropdown.classList.contains('show')) {
+		                mypageDropdown.classList.remove('show');
+		            }
+		        }
+		    });
+		}
+	});
+
+    document.querySelectorAll('.mapLink .area').forEach(area => {
+        area.addEventListener('mouseover', function() {
+            let areaClass = this.classList[1];
+            document.querySelectorAll('.mapImg img').forEach(img => {
+                img.style.display = 'none';
+            });
+            document.querySelector(`.mapImg .${areaClass}`).style.display = 'block';
+        });
+
+        area.addEventListener('mouseout', function() {
+            document.querySelectorAll('.mapImg img').forEach(img => {
+                img.style.display = 'none';
+            });
+            document.querySelector('.mapImg .all').style.display = 'block';  // 기본 지도 표시
+        });
+    });
+    function getBreweryList(local) {
+		$.ajax({
+			url : "/brewery/localList",
+			data : { "local" : local },
+			type : "GET",
+			dataType : "json",
+			success : function(data) {
+		    	var localName = localToLocalName(local);
+// 				console.log(data);
+				document.querySelector("#selected-local").innerHTML = localName;
+                var listBox = document.querySelector("#list-box");
+                listBox.innerHTML = '';
+                if (data.length > 0) {
+                    for (let i = 0; i < data.length; i++) {
+                        listBox.innerHTML += `<div id="brewery-detail"">
+                            <div id="img-div" style="background-image: url('${data[i].filePath}/${data[i].fileRename}" onclick="goToBreweryDetail(${data[i].breweryNo})");"></div>
+                            <div id="text-div">
+                                <div id="brewery-name" onclick="goToBreweryDetail(${data[i].breweryNo})">${data[i].breweryName}</div>
+                               	<div id="brewery-addr">주소 | ${data[i].breweryAddr}</div><br>
+                                <div id="brewery-phone">예약문의 | ${data[i].breweryPhone}</div>
+                            </div>
+                        </div>`;
+                    }
+                    listBox.innerHTML += 
+                    `<button id="list-btn" data-local="${localName}" onclick="goList(this)">전체보기</button>`;
+                }
+			},
+			error : function() {
+				alert("전송 실패");    			
+			}
+		})
+    }
+    function goToBreweryDetail(breweryNo) {
+    	window.location.href = `/brewery/detail/${breweryNo}`;
+    }
+    function goList(button) {
+    	var local = button.getAttribute("data-local");
+    	var hashTag = convertLocalToHashTag(local);
+    	$.ajax({
+    		url : "/brewery/taglist",
+    		data : { "hashTag" : hashTag },
+    		type : "GET",
+    		dataType : "json",
+    		success : function(data) {
+    			console.log(data);
+   			  	localStorage.setItem('breweryListData', JSON.stringify(data));
+   				localStorage.setItem('hashTag', hashTag);
+    			location.href = "/brewery/list";
+    		},
+    		error : function() {
+    			alert("전송 실패");
+    		}
+    	})
+    }
+	    function showList(tagName) {
+	//     	console.log(tag);
+	    	$.ajax({
+	    		url : "/brewery/showByTag",
+	    		data : { "tagName" : tagName },
+	    		type : "GET",
+	    		success : function(data) {
+// 	    			console.log(data);
+	    			$('#brewery-list').replaceWith(data);
+					
+	    		},
+	    		error : function() {
+	    			alert("전송 실패");
+	    		}
+	    	})
+	    }
+    function convertLocalToHashTag(local) {
+        switch(local) {
+            case 'all': return '#전국';
+            case 'sudo': return '#수도권';
+            case 'gang': return '#강원';
+            case 'chung': return '#충청';
+            case 'gyeong': return '#경상';
+            case 'jeoll': return '#전라';
+            case 'jeju': return '#제주';
+            default: return '#' + local;
+        }
+    }
+
+    function localToLocalName(local) {
+        switch(local) {
+            case 'all': return '전국';
+            case 'sudo': return '수도권';
+            case 'gang': return '강원';
+            case 'chung': return '충청';
+            case 'gyeong': return '경상';
+            case 'jeoll': return '전라';
+            case 'jeju': return '제주';
+            default: return local;
+        }
+    }
+    </script>
+</html>
